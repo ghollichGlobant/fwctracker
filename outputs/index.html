@@ -1,0 +1,1638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'none'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="X-Frame-Options" content="DENY">
+<meta name="referrer" content="no-referrer">
+<title>⚽ Facundo's FIFA World Cup 2026 Sticker Album Tracker</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Russo+One&family=Inter:wght@400;500;600;700&display=swap');
+
+  :root {
+    --pitch-green: #1b5e20;
+    --pitch-light: #2e7d32;
+    --pitch-dark: #0d3b11;
+    --gold: #ffd600;
+    --gold-dark: #c7a500;
+    --white: #ffffff;
+    --missing-bg: #37474f;
+    --missing-border: #546e7a;
+    --complete-bg: #1b5e20;
+    --complete-border: #4caf50;
+    --repeated-bg: #e65100;
+    --repeated-border: #ff9800;
+    --card-bg: #1a1a2e;
+    --card-border: #2a2a4a;
+    --bg-dark: #0f0f1a;
+    --text-primary: #e0e0e0;
+    --text-secondary: #9e9e9e;
+    --foil-gradient: linear-gradient(135deg, #ffd700, #ffec8b, #ffd700, #daa520);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, var(--pitch-dark), var(--pitch-green), var(--pitch-dark));
+    border-bottom: 4px solid var(--gold);
+    padding: 20px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .header-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .header-title h1 {
+    font-family: 'Russo One', sans-serif;
+    font-size: 1.6rem;
+    color: var(--white);
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  }
+  .header-title .owner-badge {
+    background: var(--gold);
+    color: var(--pitch-dark);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+  }
+  .ball-icon {
+    font-size: 2rem;
+    animation: spin 4s linear infinite;
+  }
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  /* STATS BAR */
+  .stats-bar {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: 16px;
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .stat-box {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 8px 16px;
+    text-align: center;
+    min-width: 110px;
+  }
+  .stat-box .stat-value {
+    font-family: 'Russo One', sans-serif;
+    font-size: 1.4rem;
+    color: var(--gold);
+  }
+  .stat-box .stat-label {
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.7);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .stat-box.complete-stat .stat-value { color: #4caf50; }
+  .stat-box.repeated-stat .stat-value { color: #ff9800; }
+  .stat-box.missing-stat .stat-value { color: #78909c; }
+
+  .progress-bar-container {
+    flex: 1;
+    min-width: 200px;
+    background: rgba(0,0,0,0.4);
+    border-radius: 12px;
+    height: 28px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.1);
+    position: relative;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--pitch-green), #4caf50, var(--gold));
+    border-radius: 12px;
+    transition: width 0.5s ease;
+    position: relative;
+  }
+  .progress-bar-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+    z-index: 2;
+  }
+
+  /* TOOLBAR */
+  .toolbar {
+    max-width: 1400px;
+    margin: 16px auto;
+    padding: 0 24px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .search-box {
+    flex: 1;
+    min-width: 200px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: 2px solid var(--card-border);
+    background: var(--card-bg);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .search-box:focus { border-color: var(--gold); }
+  .search-box::placeholder { color: var(--text-secondary); }
+
+  .filter-btn {
+    padding: 10px 18px;
+    border-radius: 10px;
+    border: 2px solid var(--card-border);
+    background: var(--card-bg);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .filter-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .filter-btn.active { background: var(--gold); color: var(--pitch-dark); border-color: var(--gold); }
+
+  .action-btn {
+    padding: 10px 18px;
+    border-radius: 10px;
+    border: 2px solid var(--pitch-green);
+    background: var(--pitch-green);
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .action-btn:hover { background: var(--pitch-light); }
+  .action-btn.danger { border-color: #c62828; background: #c62828; }
+  .action-btn.danger:hover { background: #e53935; }
+
+  /* MAIN */
+  .main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px 60px;
+  }
+
+  /* SECTION */
+  .album-section {
+    margin-bottom: 24px;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    background: linear-gradient(135deg, var(--card-bg), #1e1e36);
+    border: 1px solid var(--card-border);
+    border-radius: 14px 14px 0 0;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s;
+  }
+  .section-header:hover { background: #22223a; }
+  .section-header.collapsed + .section-body { display: none; }
+  .section-header .section-title {
+    font-family: 'Russo One', sans-serif;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-header .section-title .group-badge {
+    background: var(--gold);
+    color: var(--pitch-dark);
+    padding: 2px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+  .section-progress {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.85rem;
+  }
+  .section-progress-bar {
+    width: 120px;
+    height: 8px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .section-progress-fill {
+    height: 100%;
+    background: #4caf50;
+    border-radius: 4px;
+    transition: width 0.3s;
+  }
+  .chevron {
+    transition: transform 0.3s;
+    font-size: 1.2rem;
+  }
+  .section-header.collapsed .chevron { transform: rotate(-90deg); }
+
+  .section-body {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-top: none;
+    border-radius: 0 0 14px 14px;
+    padding: 16px;
+  }
+
+  /* TEAM HEADER inside section */
+  .team-block {
+    margin-bottom: 16px;
+  }
+  .team-block:last-child { margin-bottom: 0; }
+  .team-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-primary);
+  }
+  .team-name .flag { font-size: 1.3rem; }
+  .team-mini-progress {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-left: auto;
+  }
+
+  /* STICKER GRID */
+  .sticker-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 8px;
+  }
+  .sticker {
+    position: relative;
+    border-radius: 10px;
+    padding: 10px 6px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 2px solid;
+    user-select: none;
+    min-height: 72px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .sticker:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+  .sticker:active { transform: scale(0.96); }
+
+  .sticker.missing {
+    background: var(--missing-bg);
+    border-color: var(--missing-border);
+    opacity: 0.6;
+  }
+  .sticker.complete {
+    background: var(--complete-bg);
+    border-color: var(--complete-border);
+    opacity: 1;
+  }
+  .sticker.repeated {
+    background: var(--repeated-bg);
+    border-color: var(--repeated-border);
+    opacity: 1;
+  }
+
+  .sticker .sticker-code {
+    font-family: 'Russo One', sans-serif;
+    font-size: 0.75rem;
+    margin-bottom: 2px;
+  }
+  .sticker .sticker-label {
+    font-size: 0.6rem;
+    color: rgba(255,255,255,0.7);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+  }
+  .sticker .sticker-status-icon {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    font-size: 0.65rem;
+  }
+  .sticker.foil {
+    border-width: 2px;
+  }
+  .sticker.foil.complete {
+    background: linear-gradient(135deg, #1b5e20, #2e7d32, #388e3c);
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+  }
+  .sticker.foil .sticker-code::after {
+    content: " ✨";
+    font-size: 0.6rem;
+  }
+
+  /* REPEATED COUNT BADGE */
+  .sticker .repeat-count {
+    position: absolute;
+    bottom: 3px;
+    right: 5px;
+    background: #ff6d00;
+    color: white;
+    font-size: 0.55rem;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 8px;
+    display: none;
+  }
+  .sticker.repeated .repeat-count { display: block; }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal {
+    background: var(--card-bg);
+    border: 2px solid var(--gold);
+    border-radius: 16px;
+    padding: 24px;
+    max-width: 400px;
+    width: 90%;
+  }
+  .modal h3 {
+    font-family: 'Russo One', sans-serif;
+    margin-bottom: 16px;
+    color: var(--gold);
+  }
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+  .modal-actions button {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: opacity 0.2s;
+  }
+  .modal-actions button:hover { opacity: 0.85; }
+  .btn-missing { background: var(--missing-bg); color: white; border: 2px solid var(--missing-border) !important; }
+  .btn-complete { background: var(--complete-bg); color: white; border: 2px solid var(--complete-border) !important; }
+  .btn-repeated { background: var(--repeated-bg); color: white; border: 2px solid var(--repeated-border) !important; }
+  .btn-close { background: #424242; color: white; }
+
+  .repeat-input-row {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .repeat-input-row.active { display: flex; }
+  .repeat-input-row label { font-size: 0.85rem; color: var(--text-secondary); }
+  .repeat-input-row input {
+    width: 70px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 2px solid var(--card-border);
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    font-size: 1rem;
+    text-align: center;
+  }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--pitch-green);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    z-index: 300;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  /* LEGEND */
+  .legend {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 12px 0;
+    margin-bottom: 12px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+  }
+  .legend-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    border: 2px solid;
+  }
+  .legend-dot.missing { background: var(--missing-bg); border-color: var(--missing-border); }
+  .legend-dot.complete { background: var(--complete-bg); border-color: var(--complete-border); }
+  .legend-dot.repeated { background: var(--repeated-bg); border-color: var(--repeated-border); }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .header-title h1 { font-size: 1.1rem; }
+    .stats-bar { gap: 8px; }
+    .stat-box { min-width: 80px; padding: 6px 10px; }
+    .stat-box .stat-value { font-size: 1.1rem; }
+    .sticker-grid { grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 6px; }
+    .sticker { padding: 8px 4px; min-height: 62px; }
+    .toolbar { padding: 0 12px; }
+    .main { padding: 0 12px 60px; }
+  }
+
+  /* FOOTER */
+  .footer {
+    text-align: center;
+    padding: 24px;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    border-top: 1px solid var(--card-border);
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: var(--bg-dark); }
+  ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: #444; }
+
+  /* ===== SECURITY: LOGIN / LOCK SCREEN ===== */
+  #appContent { display: none; }
+  #appContent.unlocked { display: block; }
+
+  .login-screen {
+    position: fixed; inset: 0;
+    background: var(--bg-dark);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+  .login-screen.hidden { display: none; }
+
+  .login-card {
+    background: var(--card-bg);
+    border: 2px solid var(--gold);
+    border-radius: 20px;
+    padding: 40px 36px;
+    max-width: 420px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+  }
+  .login-card .login-ball { font-size: 3.5rem; margin-bottom: 12px; display: block; }
+  .login-card h2 {
+    font-family: 'Russo One', sans-serif;
+    font-size: 1.5rem;
+    color: var(--gold);
+    margin-bottom: 4px;
+  }
+  .login-card .login-subtitle {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    margin-bottom: 24px;
+  }
+  .login-card input[type="password"] {
+    width: 100%;
+    padding: 14px 18px;
+    border-radius: 12px;
+    border: 2px solid var(--card-border);
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    font-size: 1rem;
+    text-align: center;
+    letter-spacing: 4px;
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 12px;
+  }
+  .login-card input[type="password"]:focus { border-color: var(--gold); }
+  .login-card input[type="password"]::placeholder { letter-spacing: 1px; color: var(--text-secondary); }
+
+  .login-card .login-btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, var(--pitch-green), var(--pitch-light));
+    color: white;
+    font-family: 'Russo One', sans-serif;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    margin-bottom: 8px;
+  }
+  .login-card .login-btn:hover { opacity: 0.9; }
+  .login-card .login-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .login-error {
+    color: #ef5350;
+    font-size: 0.8rem;
+    min-height: 20px;
+    margin-top: 4px;
+  }
+  .login-hint {
+    color: var(--text-secondary);
+    font-size: 0.7rem;
+    margin-top: 16px;
+    line-height: 1.4;
+  }
+
+  .login-card .pw-strength {
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.1);
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .login-card .pw-strength-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.3s, background 0.3s;
+    width: 0;
+  }
+
+  .session-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(15,15,26,0.95);
+    border-top: 1px solid var(--card-border);
+    padding: 6px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 150;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    backdrop-filter: blur(8px);
+  }
+  .session-bar.hidden { display: none; }
+  .session-bar button {
+    background: none;
+    border: 1px solid var(--missing-border);
+    color: var(--text-secondary);
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .session-bar button:hover { border-color: var(--gold); color: var(--gold); }
+  .lock-btn-header {
+    padding: 10px 18px;
+    border-radius: 10px;
+    border: 2px solid #ff8f00;
+    background: #ff8f00;
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .lock-btn-header:hover { background: #ffa000; }
+
+  .pw-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 4px;
+  }
+  .pw-field-wrap { position: relative; margin-bottom: 12px; }
+  .pw-field-wrap input { margin-bottom: 0; }
+</style>
+</head>
+<body>
+
+<!-- ===== LOGIN / LOCK SCREEN ===== -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <span class="login-ball">⚽</span>
+    <h2 id="loginTitle">Create Password</h2>
+    <p class="login-subtitle" id="loginSubtitle">Protect Facundo's album with a password</p>
+    <div class="pw-field-wrap">
+      <input type="password" id="loginPassword" placeholder="Enter password" autocomplete="off" maxlength="64">
+      <button type="button" class="pw-toggle" onclick="togglePasswordVisibility()" title="Show/hide password">👁️</button>
+    </div>
+    <div id="confirmWrap" style="display:none;">
+      <div class="pw-field-wrap">
+        <input type="password" id="loginConfirm" placeholder="Confirm password" autocomplete="off" maxlength="64">
+      </div>
+      <div class="pw-strength"><div class="pw-strength-fill" id="pwStrengthFill"></div></div>
+    </div>
+    <button class="login-btn" id="loginBtn" onclick="handleLogin()">🔐 Set Password</button>
+    <div class="login-error" id="loginError"></div>
+    <div class="login-hint">🔒 AES-256-GCM encryption · PBKDF2 key derivation<br>Your data is encrypted locally — no servers involved</div>
+  </div>
+</div>
+
+<!-- ===== SESSION BAR ===== -->
+<div class="session-bar hidden" id="sessionBar">
+  <span>🔒 Encrypted session · Auto-lock in <span id="sessionTimer">15:00</span></span>
+  <div style="display:flex;gap:8px;">
+    <button onclick="changePassword()">🔑 Change Password</button>
+    <button onclick="lockApp()">🔒 Lock Now</button>
+  </div>
+</div>
+
+<!-- ===== APP CONTENT (hidden until unlocked) ===== -->
+<div id="appContent">
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-top">
+    <div class="header-title">
+      <span class="ball-icon">⚽</span>
+      <div>
+        <h1>FIFA World Cup 2026™ Sticker Tracker</h1>
+        <span class="owner-badge">📋 Facundo's Album</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="action-btn" onclick="exportData()">📤 Export</button>
+      <button class="action-btn" onclick="document.getElementById('importFile').click()">📥 Import</button>
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+      <button class="action-btn danger" onclick="resetAll()">🗑️ Reset</button>
+    </div>
+  </div>
+  <div class="stats-bar">
+    <div class="stat-box complete-stat">
+      <div class="stat-value" id="statComplete">0</div>
+      <div class="stat-label">Complete</div>
+    </div>
+    <div class="stat-box repeated-stat">
+      <div class="stat-value" id="statRepeated">0</div>
+      <div class="stat-label">Repeated</div>
+    </div>
+    <div class="stat-box missing-stat">
+      <div class="stat-value" id="statMissing">980</div>
+      <div class="stat-label">Missing</div>
+    </div>
+    <div class="progress-bar-container">
+      <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+      <div class="progress-bar-text" id="progressText">0 / 980 (0%)</div>
+    </div>
+  </div>
+</header>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <input type="text" class="search-box" id="searchBox" placeholder="🔍 Search sticker, team, or player...">
+  <button class="filter-btn active" data-filter="all" onclick="setFilter('all',this)">All</button>
+  <button class="filter-btn" data-filter="missing" onclick="setFilter('missing',this)">Missing</button>
+  <button class="filter-btn" data-filter="complete" onclick="setFilter('complete',this)">Complete</button>
+  <button class="filter-btn" data-filter="repeated" onclick="setFilter('repeated',this)">Repeated</button>
+</div>
+
+<!-- LEGEND -->
+<div class="main">
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot missing"></div> Missing</div>
+    <div class="legend-item"><div class="legend-dot complete"></div> Complete ✔️</div>
+    <div class="legend-item"><div class="legend-dot repeated"></div> Repeated 🔄</div>
+    <div class="legend-item" style="margin-left:auto;color:#aaa;">Click sticker to change status</div>
+  </div>
+
+  <div id="albumContent"></div>
+</div>
+
+<!-- STICKER MODAL -->
+<div class="modal-overlay" id="stickerModal">
+  <div class="modal">
+    <h3 id="modalTitle">FWC 1</h3>
+    <p id="modalLabel" style="color:var(--text-secondary);margin-bottom:8px;font-size:0.9rem;"></p>
+    <p id="modalCurrentStatus" style="font-size:0.85rem;margin-bottom:4px;"></p>
+    <div class="modal-actions">
+      <button class="btn-missing" onclick="setStatus('missing')">❌ Missing</button>
+      <button class="btn-complete" onclick="setStatus('complete')">✅ Complete</button>
+      <button class="btn-repeated" onclick="setStatus('repeated')">🔄 Repeated</button>
+    </div>
+    <div class="repeat-input-row" id="repeatRow">
+      <label>How many duplicates?</label>
+      <input type="number" id="repeatCount" min="1" max="99" value="1" onchange="updateRepeatCount()">
+    </div>
+    <div class="modal-actions" style="margin-top:12px;">
+      <button class="btn-close" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<footer class="footer">
+  ⚽ Panini FIFA World Cup 2026™ Sticker Album Tracker — Owner: Facundo — 980 Stickers · 48 Teams · 12 Groups<br>
+  Data verified against official Panini sources, si.com, Scanini, and FourFourTwo · May 2026
+</footer>
+
+<script>
+// ============================================================
+// DATA — FIFA World Cup 2026 Panini Album (980 stickers)
+// ============================================================
+
+const SPECIAL_STICKERS = [
+  { code: "FWC 1", label: "Official Emblem (Left)", foil: true },
+  { code: "FWC 2", label: "Official Emblem (Right)", foil: true },
+  { code: "FWC 3", label: "Official Mascots", foil: true },
+  { code: "FWC 4", label: "Official Slogan", foil: true },
+  { code: "FWC 5", label: "Official Ball", foil: true },
+  { code: "FWC 6", label: "Canada (Host)", foil: true },
+  { code: "FWC 7", label: "Mexico (Host)", foil: true },
+  { code: "FWC 8", label: "USA (Host)", foil: true },
+  { code: "FWC 9", label: "FIFA Museum — Italy 1934", foil: true },
+  { code: "FWC 10", label: "FIFA Museum — Uruguay 1950", foil: true },
+  { code: "FWC 11", label: "FIFA Museum — W. Germany 1954", foil: true },
+  { code: "FWC 12", label: "FIFA Museum — Brazil 1962", foil: true },
+  { code: "FWC 13", label: "FIFA Museum — W. Germany 1974", foil: true },
+  { code: "FWC 14", label: "FIFA Museum — Argentina 1986", foil: true },
+  { code: "FWC 15", label: "FIFA Museum — Brazil 1994", foil: true },
+  { code: "FWC 16", label: "FIFA Museum — Brazil 2002", foil: true },
+  { code: "FWC 17", label: "FIFA Museum — Italy 2006", foil: true },
+  { code: "FWC 18", label: "FIFA Museum — Germany 2014", foil: true },
+  { code: "FWC 19", label: "FIFA Museum — Argentina 2022", foil: true },
+  { code: "FWC 20", label: "Panini Logo", foil: true },
+];
+
+const GROUPS = [
+  {
+    name: "Group A",
+    teams: [
+      { code: "MEX", name: "Mexico", flag: "🇲🇽", players: ["Luis Malagón","Johan Vásquez","Jorge Sánchez","César Montes","Jesús Gallardo","Israel Reyes","Diego Lainez","Carlos Rodríguez","Edson Álvarez","Orbelín Pineda","Marcel Ruiz","Team Photo","Érick Sánchez","Hirving Lozano","Santiago Giménez","Raúl Jiménez","Alexis Vega","Roberto Alvarado","César Huerta"] },
+      { code: "RSA", name: "South Africa", flag: "🇿🇦", players: ["Ronwen Williams","Khuliso Mudau","Mothobi Mvala","Grant Kekana","Aubrey Modiba","Rushwin Dortley","Teboho Mokoena","Bathusi Aubaas","Luke Le Roux","Iqraam Rayners","Themba Zwane","Team Photo","Oswin Appollis","Percy Tau","Lyle Foster","Elias Mokwana","Relebohile Mofokeng","Patrick Maswanganyi","Thalente Mbatha"] },
+      { code: "KOR", name: "South Korea", flag: "🇰🇷", players: ["Kim Seung-gyu","Kim Min-jae","Kim Jin-su","Kim Young-gwon","Cho Yu-min","Seol Young-woo","Lee Kang-in","Hwang In-beom","Son Heung-min","Jung Woo-young","Lee Jae-sung","Team Photo","Bae Jun-ho","Hwang Hee-chan","Oh Se-hun","Joo Min-kyu","Park Jin-sub","Yang Hyun-jun","Jeong Sang-bin"] },
+      { code: "CZE", name: "Czechia", flag: "🇨🇿", players: ["Jindřich Staněk","Vladimír Coufal","Robin Hranáč","Ladislav Krejčí","David Jurásek","Martin Vitík","Tomáš Souček","Lukáš Provod","Alex Král","Pavel Šulc","Antonín Barák","Team Photo","Ondřej Lingr","Adam Hložek","Patrik Schick","Mojmír Chytil","Tomáš Chorý","Václav Černý","Matěj Jurásek"] },
+    ]
+  },
+  {
+    name: "Group B",
+    teams: [
+      { code: "CAN", name: "Canada", flag: "🇨🇦", players: ["Maxime Crépeau","Alistair Johnston","Kamal Miller","Moise Bombito","Sam Adekugbe","Derek Cornelius","Stephen Eustáquio","Tajon Buchanan","Alphonso Davies","Ismael Koné","Jonathan David","Team Photo","Liam Millar","Cyle Larin","Tani Oluwaseyi","Jonathan Osorio","Ali Ahmed","Jacen Russell-Rowe","Mika Ollos"] },
+      { code: "BIH", name: "Bosnia & Herzegovina", flag: "🇧🇦", players: ["Nikola Vasilj","Amar Dedić","Nikola Katić","Denis Huseinbašić","Sead Kolašinac","Ermin Bičakčić","Haris Hajradinović","Amer Gojak","Benjamin Tahirović","Ivan Bašić","Armin Gigović","Team Photo","Edin Džeko","Ermedin Demirović","Denis Undav","Luka Kulenović","Antonio Stanić","Edin Višća","Dario Šarić"] },
+      { code: "QAT", name: "Qatar", flag: "🇶🇦", players: ["Meshaal Barsham","Pedro Miguel","Bassam Al-Rawi","Boualem Khoukhi","Homam Ahmed","Tarek Salman","Hassan Al-Haydos","Abdulaziz Hatem","Karim Boudiaf","Ali Assadalla","Akram Afif","Team Photo","Almoez Ali","Mohammed Muntari","Ahmed Alaaeldin","Jassem Gaber","Yousef Ayman","Moustafa Tarek","Ismaeel Mohammad"] },
+      { code: "SUI", name: "Switzerland", flag: "🇨🇭", players: ["Yann Sommer","Silvan Widmer","Manuel Akanji","Nico Elvedi","Ricardo Rodríguez","Leonidas Stergiou","Granit Xhaka","Remo Freuler","Denis Zakaria","Xherdan Shaqiri","Fabian Rieder","Team Photo","Breel Embolo","Noah Okafor","Zeki Amdouni","Dan Ndoye","Ruben Vargas","Michel Aebischer","Filip Ugrinic"] },
+    ]
+  },
+  {
+    name: "Group C",
+    teams: [
+      { code: "BRA", name: "Brazil", flag: "🇧🇷", players: ["Alisson","Danilo","Marquinhos","Gabriel Magalhães","Abner","Éder Militão","Bruno Guimarães","Lucas Paquetá","Vinícius Jr.","Rodrygo","Raphinha","Team Photo","Endrick","Estêvão","Savinho","Igor Jesus","Luiz Henrique","André","Matheuzinho"] },
+      { code: "MAR", name: "Morocco", flag: "🇲🇦", players: ["Yassine Bounou","Achraf Hakimi","Nayef Aguerd","Romain Saïss","Noussair Mazraoui","Adam Aznou","Sofyan Amrabat","Hakim Ziyech","Azzedine Ounahi","Ilias Akhomach","Ibrahim Díaz","Team Photo","Youssef En-Nesyri","Ayoub El Kaabi","Bilal El Khannouss","Eliesse Ben Seghir","Ez Abde","Amir Richardson","Abdessamad Ezzalzouli"] },
+      { code: "HAI", name: "Haiti", flag: "🇭🇹", players: ["Alexandre Pierre","Carlens Arcus","Jean-Sylvain Babin","Kevin Lafrance","Mikaël Gabriel","Bryan Alcéus","Derrick Étienne Jr.","Oalex Anderson","Leverton Pierre","Frantzdy Pierrot","Duckens Nazon","Team Photo","Mondy Prunier","Danley Jean-Jacques","Steeven Saba","Ricardo Adé","Christiano François","Nelson Bonhomme","Ronaldo Damus"] },
+      { code: "SCO", name: "Scotland", flag: "🏴󠁧󠁢󠁳󠁣󠁴󠁿", players: ["Angus Gunn","Anthony Ralston","Grant Hanley","John Souttar","Andrew Robertson","Scott McKenna","John McGinn","Callum McGregor","Scott McTominay","Billy Gilmour","Ryan Christie","Team Photo","Che Adams","Lyndon Dykes","Lawrence Shankland","Lewis Morgan","Kenny McLean","Ben Doak","Tommy Conway"] },
+    ]
+  },
+  {
+    name: "Group D",
+    teams: [
+      { code: "USA", name: "United States", flag: "🇺🇸", players: ["Matt Turner","Sergiño Dest","Chris Richards","Tim Ream","Antonee Robinson","Mark McKenzie","Weston McKennie","Tyler Adams","Christian Pulisic","Gio Reyna","Yunus Musah","Team Photo","Folarin Balogun","Ricardo Pepi","Tim Weah","Brenden Aaronson","Johnny Cardoso","Malik Tillman","Aidan Morris"] },
+      { code: "PAR", name: "Paraguay", flag: "🇵🇾", players: ["Rodrigo Morínigo","Juan Escobar","Gustavo Gómez","Omar Alderete","Junior Alonso","Fabián Balbuena","Andrés Cubas","Mathías Villasanti","Miguel Almirón","Ángel Romero","Julio Enciso","Team Photo","Antonio Sanabria","Ramón Sosa","Matías Rojas","Alex Arce","Derlis González","Néstor Giménez","Diego Gómez"] },
+      { code: "AUS", name: "Australia", flag: "🇦🇺", players: ["Mat Ryan","Nathaniel Atkinson","Harry Souttar","Kye Rowles","Aziz Behich","Lewis Miller","Aaron Mooy","Jackson Irvine","Tom Rogic","Ajdin Hrustić","Riley McGree","Team Photo","Mitchell Duke","Jamie Maclaren","Craig Goodwin","Awer Mabil","Keanu Baccus","Cameron Devlin","Kusini Yengi"] },
+      { code: "TUR", name: "Türkiye", flag: "🇹🇷", players: ["Altay Bayındır","Zeki Çelik","Merih Demiral","Kaan Ayhan","Ferdi Kadıoğlu","Samet Akaydin","Hakan Çalhanoğlu","İrfan Can Kahveci","Arda Güler","Orkun Kökçü","Kenan Yıldız","Team Photo","Barış Alper Yılmaz","Enes Ünal","Yusuf Yazıcı","Cenk Tosun","Yunus Akgün","Semih Kılıçsoy","Abdülkerim Bardakcı"] },
+    ]
+  },
+  {
+    name: "Group E",
+    teams: [
+      { code: "GER", name: "Germany", flag: "🇩🇪", players: ["Marc-André ter Stegen","Joshua Kimmich","Antonio Rüdiger","Jonathan Tah","David Raum","Robin Koch","İlkay Gündoğan","Jamal Musiala","Florian Wirtz","Kai Havertz","Leroy Sané","Team Photo","Serge Gnabry","Niclas Füllkrug","Deniz Undav","Chris Führich","Aleksandar Pavlović","Robert Andrich","Maximilian Beier"] },
+      { code: "CUW", name: "Curaçao", flag: "🇨🇼", players: ["Eloy Room","Juriën Gaari","Cuco Martina","Darryl Lachman","Shermaine Martina","Gervane Kastaneer","Leandro Bacuna","Kenji Gorré","Juninho Bacuna","Jarchinio Antonia","Rangelo Janga","Team Photo","Elson Hooi","Brandley Kuwas","Redirecth Redan","Gevaro Nepomuceno","Shanon Carmelia","Jeredy Hilterman","Jeremy De Nooijer"] },
+      { code: "CIV", name: "Ivory Coast", flag: "🇨🇮", players: ["Yahia Fofana","Serge Aurier","Willy Boly","Kossounou Odilon","Ghislain Konan","Emmanuel Agbadou","Franck Kessié","Ibrahim Sangaré","Seko Fofana","Jean-Philippe Krasso","Oumar Diakité","Team Photo","Nicolas Pépé","Wilfried Zaha","Karim Konaté","Simon Adingra","Maxwel Cornet","Christian Kouamé","Oumar Diakité"] },
+      { code: "ECU", name: "Ecuador", flag: "🇪🇨", players: ["Hernán Galíndez","Angelo Preciado","Félix Torres","Piero Hincapié","Pervis Estupiñán","Xavier Arreaga","Moisés Caicedo","Gonzalo Plata","Kendry Páez","Jeremy Sarmiento","Alan Franco","Team Photo","Enner Valencia","Michael Estrada","Kevin Rodríguez","John Yeboah","Joao Rojas","Ángel Mena","Pedro Vite"] },
+    ]
+  },
+  {
+    name: "Group F",
+    teams: [
+      { code: "NED", name: "Netherlands", flag: "🇳🇱", players: ["Bart Verbruggen","Denzel Dumfries","Virgil van Dijk","Nathan Aké","Daley Blind","Stefan de Vrij","Frenkie de Jong","Tijjani Reijnders","Xavi Simons","Ryan Gravenberch","Jeremie Frimpong","Team Photo","Memphis Depay","Cody Gakpo","Brian Brobbey","Donyell Malen","Joshua Zirkzee","Jurriën Timber","Micky van de Ven"] },
+      { code: "JPN", name: "Japan", flag: "🇯🇵", players: ["Shuichi Gonda","Hiroki Sakai","Ko Itakura","Shogo Taniguchi","Yuto Nagatomo","Takehiro Tomiyasu","Wataru Endo","Hidemasa Morita","Takefusa Kubo","Ritsu Doan","Daichi Kamada","Team Photo","Ayase Ueda","Kaoru Mitoma","Junya Ito","Kyogo Furuhashi","Takumi Minamino","Keito Nakamura","Ao Tanaka"] },
+      { code: "SWE", name: "Sweden", flag: "🇸🇪", players: ["Robin Olsen","Emil Krafth","Victor Lindelöf","Alexander Milosevic","Ludwig Augustinsson","Hjalmar Ekdal","Emil Forsberg","Albin Ekdal","Dejan Kulusevski","Alexander Isak","Viktor Gyökeres","Team Photo","Anthony Elanga","Hugo Larsson","Jesper Karlström","Yasin Ayari","Mattias Svanberg","Viktor Claesson","Samuel Dahl"] },
+      { code: "TUN", name: "Tunisia", flag: "🇹🇳", players: ["Aymen Dahmen","Mohamed Dräger","Yassine Meriah","Dylan Bronn","Ali Abdi","Montassar Talbi","Ellyes Skhiri","Aïssa Laïdouni","Naïm Sliti","Mohamed Ali Ben Romdhane","Wahbi Khazri","Team Photo","Youssef Msakni","Seifeddine Jaziri","Anis Ben Slimane","Hannibal Mejbri","Saad Bguir","Hamza Rafia","Elyès Achouri"] },
+    ]
+  },
+  {
+    name: "Group G",
+    teams: [
+      { code: "BEL", name: "Belgium", flag: "🇧🇪", players: ["Koen Casteels","Timothy Castagne","Jan Vertonghen","Wout Faes","Arthur Theate","Zeno Debast","Kevin De Bruyne","Youri Tielemans","Amadou Onana","Leandro Trossard","Jérémy Doku","Team Photo","Romelu Lukaku","Loïs Openda","Charles De Ketelaere","Johan Bakayoko","Arne Engels","Orel Mangala","Arthur Vermeeren"] },
+      { code: "EGY", name: "Egypt", flag: "🇪🇬", players: ["Mohamed El Shenawy","Ahmed Fatouh","Mohamed Abdel-Monem","Mahmoud Hamdi","Ahmed Hegazi","Omar Gaber","Mohamed Salah","Trézéguet","Emam Ashour","Mohamed Elneny","Ibrahim Adel","Team Photo","Ahmed Hassan Kouka","Mostafa Mohamed","Omar Marmoush","Marwan Hamdi","Hussein El Shahat","Ahmed Sayed","Karim Hafez"] },
+      { code: "IRN", name: "Iran", flag: "🇮🇷", players: ["Alireza Beiranvand","Sadegh Moharrami","Hossein Kanaanizadegan","Morteza Pouraliganji","Ehsan Hajsafi","Shoja Khalilzadeh","Saeid Ezatolahi","Ahmad Nourollahi","Alireza Jahanbakhsh","Mehdi Taremi","Sardar Azmoun","Team Photo","Allahyar Sayyadmanesh","Karim Ansarifard","Mehdi Ghayedi","Saman Ghoddos","Ali Gholizadeh","Omid Noorafkan","Ramin Rezaeian"] },
+      { code: "NZL", name: "New Zealand", flag: "🇳🇿", players: ["Stefan Marinovic","Michael Boxall","Tommy Smith","Nando Pijnaker","Liberato Cacace","Tim Payne","Joe Bell","Marko Stamenic","Matt Garbett","Chris Wood","Ben Waine","Team Photo","Elijah Just","Alex Greive","Kosta Barbarouses","Logan Rogerson","Sarpreet Singh","Jesse Randall","Finn Sheridan"] },
+    ]
+  },
+  {
+    name: "Group H",
+    teams: [
+      { code: "ESP", name: "Spain", flag: "🇪🇸", players: ["Unai Simón","Dani Carvajal","Aymeric Laporte","Robin Le Normand","Marc Cucurella","Pau Cubarsí","Rodri","Pedri","Gavi","Dani Olmo","Nico Williams","Team Photo","Lamine Yamal","Álvaro Morata","Mikel Oyarzabal","Ferran Torres","Alejandro Baena","Fermín López","Álex Baena"] },
+      { code: "CPV", name: "Cape Verde", flag: "🇨🇻", players: ["Vozinha","Steven Fortes","Roberto Lopes","Logan Costa","Dylan Tavares","Diney Borges","Nuno Borges","Kenny Rocha","Jamiro Monteiro","Jovane Cabral","Ryan Mendes","Team Photo","Garry Rodrigues","Lisandro Semedo","Gilson Benchimol","Wélber","Zé Luís","Djaniny","Hélio Varela"] },
+      { code: "KSA", name: "Saudi Arabia", flag: "🇸🇦", players: ["Mohammed Al-Owais","Yasser Al-Shahrani","Ali Al-Bulaihi","Abdulelah Al-Amri","Hassan Tambakti","Saud Abdulhamid","Salem Al-Dawsari","Abdulrahman Al-Aboud","Mohamed Kanno","Nawaf Al-Abed","Firas Al-Buraikan","Team Photo","Abdullah Radif","Ayman Yahya","Sami Al-Najei","Ali Al-Hassan","Saad Al-Sheeb","Sultan Al-Ghannam","Nasser Al-Dawsari"] },
+      { code: "URU", name: "Uruguay", flag: "🇺🇾", players: ["Sergio Rochet","Nahitan Nández","José María Giménez","Ronald Araújo","Mathías Olivera","Sebastián Cáceres","Federico Valverde","Rodrigo Bentancur","Manuel Ugarte","Nicolás de la Cruz","Giorgian De Arrascaeta","Team Photo","Darwin Núñez","Luis Suárez","Facundo Pellistri","Maximiliano Araújo","Agustín Canobbio","Facundo Torres","Luciano Rodríguez"] },
+    ]
+  },
+  {
+    name: "Group I",
+    teams: [
+      { code: "FRA", name: "France", flag: "🇫🇷", players: ["Mike Maignan","Jules Koundé","William Saliba","Dayot Upamecano","Theo Hernández","Ibrahima Konaté","Aurélien Tchouaméni","Antoine Griezmann","Eduardo Camavinga","N'Golo Kanté","Warren Zaïre-Emery","Team Photo","Kylian Mbappé","Marcus Thuram","Ousmane Dembélé","Randal Kolo Muani","Bradley Barcola","Michael Olise","Désiré Doué"] },
+      { code: "SEN", name: "Senegal", flag: "🇸🇳", players: ["Edouard Mendy","Formose Mendy","Kalidou Koulibaly","Abdou Diallo","Ismail Jakobs","Abdoulaye Seck","Idrissa Gueye","Nampalys Mendy","Pape Matar Sarr","Krépin Diatta","Ismaïla Sarr","Team Photo","Sadio Mané","Boulaye Dia","Nicolas Jackson","Iliman Ndiaye","Habib Diarra","Lamine Camara","Mikayil Faye"] },
+      { code: "IRQ", name: "Iraq", flag: "🇮🇶", players: ["Jalal Hassan","Ahmed Ibrahim","Ali Adnan","Rebin Sulaka","Saad Natiq","Bashar Resan","Amjad Attwan","Ibrahim Bayesh","Ali Jasim","Mohanad Ali","Aymen Hussein","Team Photo","Hussein Ali","Alaa Abbas","Mohammed Dawood","Ahmed Yasin","Sherko Kareem","Zidane Iqbal","Ali Al-Hamadi"] },
+      { code: "NOR", name: "Norway", flag: "🇳🇴", players: ["Ørjan Nyland","Marcus Holmgren Pedersen","Leo Skiri Østigård","Stefan Strandberg","Birger Meling","David Møller Wolfe","Martin Ødegaard","Sander Berge","Fredrik Aursnes","Alexander Sørloth","Erling Haaland","Team Photo","Antonio Nusa","Jørgen Strand Larsen","Oscar Bobb","Brynjar Bjarnason","Mohamed Elyounoussi","Patrick Berg","Marcus Solbakken"] },
+    ]
+  },
+  {
+    name: "Group J",
+    teams: [
+      { code: "ARG", name: "Argentina", flag: "🇦🇷", players: ["Emiliano Martínez","Nahuel Molina","Cristian Romero","Nicolás Otamendi","Nicolás Tagliafico","Leonardo Balerdi","Enzo Fernández","Alexis Mac Allister","Rodrigo De Paul","Exequiel Palacios","Leandro Paredes","Team Photo","Nico Paz","Franco Mastantuono","Nico González","Lionel Messi","Lautaro Martínez","Julián Álvarez","Giuliano Simeone"] },
+      { code: "ALG", name: "Algeria", flag: "🇩🇿", players: ["Raïs M'Bolhi","Aïssa Mandi","Djamel Benlamri","Ramy Bensebaïni","Youcef Atal","Ilyes Chetti","Ismaël Bennacer","Sofiane Feghouli","Houssem Aouar","Saïd Benrahma","Amine Gouiri","Team Photo","Islam Slimani","Baghdad Bounedjah","Mohamed Amoura","Riyad Mahrez","Yacine Brahimi","Ramiz Zerrouki","Farès Chaïbi"] },
+      { code: "AUT", name: "Austria", flag: "🇦🇹", players: ["Patrick Pentz","Stefan Posch","Philipp Lienhart","Kevin Danso","David Alaba","Gernot Trauner","Konrad Laimer","Marcel Sabitzer","Christoph Baumgartner","Nicolas Seiwald","Florian Grillitsch","Team Photo","Marko Arnautović","Michael Gregoritsch","Patrick Wimmer","Romano Schmid","Maximilian Entrup","Matthias Seidl","Phillipp Mwene"] },
+      { code: "JOR", name: "Jordan", flag: "🇯🇴", players: ["Yazeed Abulaila","Salem Al-Ajalin","Anas Bani Yaseen","Ehsan Haddad","Ahmad Saleh","Abdallah Nasib","Mousa Al-Tamari","Yazan Al-Naimat","Baha Faisal","Musa Al-Haj","Hamza Al-Dardour","Team Photo","Ali Olwan","Nizar Al Rashdan","Oday Dabbagh","Mohammed Abu Hashish","Al-Mustafa Al-Bashtawi","Yousef Abu Laban","Deeb Ghanem"] },
+    ]
+  },
+  {
+    name: "Group K",
+    teams: [
+      { code: "POR", name: "Portugal", flag: "🇵🇹", players: ["Diogo Costa","João Cancelo","Rúben Dias","Pepe","Nuno Mendes","Gonçalo Inácio","Bernardo Silva","Bruno Fernandes","Vitinha","João Palhinha","João Neves","Team Photo","Cristiano Ronaldo","Rafael Leão","Diogo Jota","Francisco Conceição","Pedro Neto","Geovany Quenda","Trincão"] },
+      { code: "COD", name: "DR Congo", flag: "🇨🇩", players: ["Lionel Mpasi","Glody Ngonda","Chancel Mbemba","Christian Luyindama","Arthur Masuaku","Héritier Deyonge","Meschack Elia","Samuel Moutoussamy","Gaël Kakuta","Chadrac Akolo","Yoane Wissa","Team Photo","Cédric Bakambu","Silas Katompa","Théo Bongonda","Arthur Mokulu","Fiston Mayele","Samuel Bastien","Nathan Ntsia-Biamou"] },
+      { code: "UZB", name: "Uzbekistan", flag: "🇺🇿", players: ["Eldorbek Suyunov","Abdukodir Khusanov","Husniddin Alikulov","Islom Tukhtakhodjaev","Odiljon Hamrobekov","Davron Khashimov","Oston Urunov","Jaloliddin Masharipov","Eldor Shomurodov","Abbosbek Fayzullaev","Otabek Shukurov","Team Photo","Igor Sergeev","Ikromjon Alibaev","Bobur Abdikholiqov","Azizbek Turgunbaev","Jasur Yakhshibaev","Khusain Norchaev","Ibrokhim Abdurakhmonov"] },
+      { code: "COL", name: "Colombia", flag: "🇨🇴", players: ["David Ospina","Daniel Muñoz","Yerry Mina","Davinson Sánchez","Johan Mojica","Carlos Cuesta","James Rodríguez","Richard Ríos","Jhon Arias","Jefferson Lerma","Jhon Durán","Team Photo","Luis Díaz","Rafael Santos Borré","Jhon Córdoba","Juan Camilo Portilla","Yaser Asprilla","Kevin Castaño","Juan David Cabal"] },
+    ]
+  },
+  {
+    name: "Group L",
+    teams: [
+      { code: "ENG", name: "England", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", players: ["Jordan Pickford","Kyle Walker","John Stones","Harry Maguire","Luke Shaw","Marc Guéhi","Declan Rice","Jude Bellingham","Phil Foden","Bukayo Saka","Cole Palmer","Team Photo","Harry Kane","Ollie Watkins","Anthony Gordon","Trent Alexander-Arnold","Kobbie Mainoo","Morgan Gibbs-White","Levi Colwill"] },
+      { code: "CRO", name: "Croatia", flag: "🇭🇷", players: ["Dominik Livaković","Josip Stanišić","Joško Gvardiol","Duje Ćaleta-Car","Borna Sosa","Josip Šutalo","Luka Modrić","Mateo Kovačić","Marcelo Brozović","Mario Pašalić","Lovro Majer","Team Photo","Andrej Kramarić","Bruno Petković","Igor Matanović","Luka Sučić","Martin Baturina","Ante Budimir","Mislav Oršić"] },
+      { code: "GHA", name: "Ghana", flag: "🇬🇭", players: ["Lawrence Ati-Zigi","Tariq Lamptey","Mohammed Salisu","Daniel Amartey","Gideon Mensah","Alexander Djiku","Thomas Partey","Mohammed Kudus","Elisha Owusu","Ibrahim Sulemana","Fatawu Issahaku","Team Photo","Jordan Ayew","Inaki Williams","Antoine Semenyo","Ernest Nuamah","Osman Bukari","Abdul-Samed Salis","Kamaldeen Sulemana"] },
+      { code: "PAN", name: "Panama", flag: "🇵🇦", players: ["Luis Mejía","Michael Murillo","Fidel Escobar","Andrés Andrade","Eric Davis","Harold Cummings","Anibal Godoy","Adalberto Carrasquilla","Alberto Quintero","Éric Davis","José Fajardo","Team Photo","Gabriel Torres","Freddy Góndola","Cecilio Waterman","Édgar Bárcenas","Ismael Díaz","César Yanis","José Luis Rodríguez"] },
+    ]
+  },
+];
+
+// ============================================================
+// STATE
+// ============================================================
+const STORAGE_KEY = "fwc2026_facundo";
+let albumState = loadState();
+let currentFilter = "all";
+let currentSearch = "";
+let selectedSticker = null;
+
+function defaultState() {
+  const state = {};
+  SPECIAL_STICKERS.forEach(s => {
+    state[s.code] = { status: "missing", repeats: 0 };
+  });
+  GROUPS.forEach(g => {
+    g.teams.forEach(t => {
+      for (let i = 1; i <= 20; i++) {
+        const code = `${t.code} ${i}`;
+        state[code] = { status: "missing", repeats: 0 };
+      }
+    });
+  });
+  return state;
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      // Merge with defaults to handle new stickers
+      const def = defaultState();
+      Object.keys(def).forEach(k => {
+        if (!parsed[k]) parsed[k] = def[k];
+      });
+      return parsed;
+    }
+  } catch(e) {}
+  return defaultState();
+}
+
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(albumState));
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function render() {
+  const container = document.getElementById("albumContent");
+  let html = "";
+
+  // Special Section
+  html += renderSection("fwc", "⭐ FIFA World Cup 2026 — Special Stickers", null, SPECIAL_STICKERS.map(s => ({
+    code: s.code,
+    label: s.label,
+    foil: s.foil,
+  })));
+
+  // Group Sections
+  GROUPS.forEach(g => {
+    const allStickers = [];
+    const teamBlocks = [];
+
+    g.teams.forEach(t => {
+      const stickers = [];
+      for (let i = 1; i <= 20; i++) {
+        const code = `${t.code} ${i}`;
+        let label = "";
+        if (i === 1) label = "Team Badge";
+        else if (i === 13) label = "Team Photo";
+        else {
+          const playerIdx = i <= 12 ? i - 2 : i - 2; // players array index
+          label = t.players[i - 2] || `Player ${i}`;
+        }
+        stickers.push({
+          code,
+          label,
+          foil: i === 1,
+        });
+      }
+      allStickers.push(...stickers);
+      teamBlocks.push({ team: t, stickers });
+    });
+
+    html += renderGroupSection(g.name, teamBlocks);
+  });
+
+  container.innerHTML = html;
+  updateStats();
+}
+
+function renderSection(id, title, badge, stickers) {
+  const filteredStickers = filterStickers(stickers);
+  if (currentSearch && filteredStickers.length === 0) return "";
+
+  const total = stickers.length;
+  const complete = stickers.filter(s => albumState[s.code]?.status === "complete" || albumState[s.code]?.status === "repeated").length;
+  const pct = Math.round((complete / total) * 100);
+
+  return `
+    <div class="album-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-title">${title}</div>
+        <div class="section-progress">
+          <span>${complete}/${total}</span>
+          <div class="section-progress-bar"><div class="section-progress-fill" style="width:${pct}%"></div></div>
+          <span>${pct}%</span>
+          <span class="chevron">▾</span>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="sticker-grid">${filteredStickers.map(renderSticker).join("")}</div>
+      </div>
+    </div>
+  `;
+}
+
+function renderGroupSection(groupName, teamBlocks) {
+  const allStickers = teamBlocks.flatMap(tb => tb.stickers);
+  const anyVisible = teamBlocks.some(tb => filterStickers(tb.stickers).length > 0);
+  if (currentSearch && !anyVisible) return "";
+
+  const total = allStickers.length;
+  const complete = allStickers.filter(s => albumState[s.code]?.status === "complete" || albumState[s.code]?.status === "repeated").length;
+  const pct = Math.round((complete / total) * 100);
+
+  let teamsHtml = "";
+  teamBlocks.forEach(tb => {
+    const filtered = filterStickers(tb.stickers);
+    if (currentSearch && filtered.length === 0) return;
+
+    const tTotal = tb.stickers.length;
+    const tComplete = tb.stickers.filter(s => albumState[s.code]?.status === "complete" || albumState[s.code]?.status === "repeated").length;
+
+    teamsHtml += `
+      <div class="team-block">
+        <div class="team-name">
+          <span class="flag">${tb.team.flag}</span>
+          ${tb.team.name}
+          <span class="team-mini-progress">${tComplete}/${tTotal}</span>
+        </div>
+        <div class="sticker-grid">${filtered.map(renderSticker).join("")}</div>
+      </div>
+    `;
+  });
+
+  const badge = groupName.replace("Group ", "");
+
+  return `
+    <div class="album-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-title">
+          <span class="group-badge">${badge}</span>
+          ⚽ ${groupName}
+        </div>
+        <div class="section-progress">
+          <span>${complete}/${total}</span>
+          <div class="section-progress-bar"><div class="section-progress-fill" style="width:${pct}%"></div></div>
+          <span>${pct}%</span>
+          <span class="chevron">▾</span>
+        </div>
+      </div>
+      <div class="section-body">${teamsHtml}</div>
+    </div>
+  `;
+}
+
+function renderSticker(s) {
+  const state = albumState[s.code] || { status: "missing", repeats: 0 };
+  const statusIcon = state.status === "complete" ? "✔️" : state.status === "repeated" ? "🔄" : "";
+  const foilClass = s.foil ? " foil" : "";
+  const repeatBadge = state.status === "repeated" && state.repeats > 0 ? `<span class="repeat-count">×${state.repeats}</span>` : "";
+
+  return `
+    <div class="sticker ${state.status}${foilClass}" onclick="openModal('${s.code}')" title="${s.code} — ${s.label}">
+      <span class="sticker-status-icon">${statusIcon}</span>
+      <div class="sticker-code">${s.code}</div>
+      <div class="sticker-label">${s.label}</div>
+      ${repeatBadge}
+    </div>
+  `;
+}
+
+function filterStickers(stickers) {
+  return stickers.filter(s => {
+    const state = albumState[s.code] || { status: "missing" };
+    if (currentFilter !== "all" && state.status !== currentFilter) return false;
+    if (currentSearch) {
+      const q = currentSearch.toLowerCase();
+      return s.code.toLowerCase().includes(q) || s.label.toLowerCase().includes(q);
+    }
+    return true;
+  });
+}
+
+// ============================================================
+// STATS
+// ============================================================
+function updateStats() {
+  const allCodes = Object.keys(albumState);
+  let complete = 0, repeated = 0, missing = 0;
+  allCodes.forEach(code => {
+    const s = albumState[code];
+    if (s.status === "complete") complete++;
+    else if (s.status === "repeated") { complete++; repeated++; }
+    else missing++;
+  });
+  const total = allCodes.length;
+  const owned = complete;
+  const pct = Math.round((owned / total) * 100);
+
+  document.getElementById("statComplete").textContent = owned;
+  document.getElementById("statRepeated").textContent = repeated;
+  document.getElementById("statMissing").textContent = missing;
+  document.getElementById("progressFill").style.width = pct + "%";
+  document.getElementById("progressText").textContent = `${owned} / ${total} (${pct}%)`;
+}
+
+// ============================================================
+// INTERACTIONS
+// ============================================================
+function toggleSection(el) {
+  el.classList.toggle("collapsed");
+}
+
+function openModal(code) {
+  selectedSticker = code;
+  const state = albumState[code] || { status: "missing", repeats: 0 };
+  document.getElementById("modalTitle").textContent = code;
+
+  // Find label
+  let label = "";
+  const fwc = SPECIAL_STICKERS.find(s => s.code === code);
+  if (fwc) { label = fwc.label; }
+  else {
+    const parts = code.split(" ");
+    const teamCode = parts[0];
+    const num = parseInt(parts[1]);
+    GROUPS.forEach(g => g.teams.forEach(t => {
+      if (t.code === teamCode) {
+        if (num === 1) label = `${t.flag} ${t.name} — Team Badge`;
+        else if (num === 13) label = `${t.flag} ${t.name} — Team Photo`;
+        else label = `${t.flag} ${t.name} — ${t.players[num - 2] || "Player"}`;
+      }
+    }));
+  }
+
+  document.getElementById("modalLabel").textContent = label;
+  const statusNames = { missing: "❌ Missing", complete: "✅ Complete", repeated: "🔄 Repeated" };
+  document.getElementById("modalCurrentStatus").innerHTML = `Current: <strong>${statusNames[state.status]}</strong>` + (state.status === "repeated" ? ` (×${state.repeats})` : "");
+  document.getElementById("repeatCount").value = state.repeats || 1;
+  document.getElementById("repeatRow").classList.toggle("active", state.status === "repeated");
+  document.getElementById("stickerModal").classList.add("active");
+}
+
+function closeModal() {
+  document.getElementById("stickerModal").classList.remove("active");
+  selectedSticker = null;
+}
+
+function setStatus(status) {
+  if (!selectedSticker) return;
+  albumState[selectedSticker].status = status;
+  if (status === "repeated") {
+    const count = parseInt(document.getElementById("repeatCount").value) || 1;
+    albumState[selectedSticker].repeats = count;
+    document.getElementById("repeatRow").classList.add("active");
+  } else {
+    albumState[selectedSticker].repeats = 0;
+    document.getElementById("repeatRow").classList.remove("active");
+  }
+  saveState();
+  render();
+  const statusNames = { missing: "❌ Missing", complete: "✅ Complete", repeated: "🔄 Repeated" };
+  document.getElementById("modalCurrentStatus").innerHTML = `Current: <strong>${statusNames[status]}</strong>` + (status === "repeated" ? ` (×${albumState[selectedSticker].repeats})` : "");
+  showToast(`${selectedSticker} → ${statusNames[status]}`);
+}
+
+function updateRepeatCount() {
+  if (!selectedSticker || albumState[selectedSticker].status !== "repeated") return;
+  const count = parseInt(document.getElementById("repeatCount").value) || 1;
+  albumState[selectedSticker].repeats = count;
+  saveState();
+  render();
+}
+
+function setFilter(filter, btn) {
+  currentFilter = filter;
+  document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  render();
+}
+
+// Search
+document.getElementById("searchBox").addEventListener("input", function(e) {
+  currentSearch = e.target.value.trim();
+  render();
+});
+
+// Close modal on overlay click
+document.getElementById("stickerModal").addEventListener("click", function(e) {
+  if (e.target === this) closeModal();
+});
+
+// Keyboard
+document.addEventListener("keydown", function(e) {
+  if (e.key === "Escape") closeModal();
+});
+
+// ============================================================
+// EXPORT / IMPORT / RESET
+// ============================================================
+function exportData() {
+  const data = {
+    owner: "Facundo",
+    album: "FIFA World Cup 2026 — Panini",
+    exportDate: new Date().toISOString(),
+    totalStickers: 980,
+    stickers: albumState,
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `fwc2026_facundo_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast("📤 Album exported!");
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (data.stickers) {
+        albumState = data.stickers;
+        // Merge with defaults
+        const def = defaultState();
+        Object.keys(def).forEach(k => {
+          if (!albumState[k]) albumState[k] = def[k];
+        });
+        saveState();
+        render();
+        showToast("📥 Album imported successfully!");
+      } else {
+        showToast("⚠️ Invalid file format");
+      }
+    } catch(err) {
+      showToast("⚠️ Error reading file");
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = "";
+}
+
+function resetAll() {
+  if (confirm("⚠️ Reset ALL stickers to Missing? This cannot be undone!")) {
+    albumState = defaultState();
+    saveState();
+    render();
+    showToast("🗑️ Album reset!");
+  }
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(msg) {
+  const toast = document.getElementById("toast");
+  toast.textContent = msg;
+  toast.classList.add("show");
+  setTimeout(() => toast.classList.remove("show"), 2500);
+}
+
+// ============================================================
+// SECURITY: AES-256-GCM + PBKDF2 Encryption Layer
+// ============================================================
+const SEC_PREFIX = "fwc2026_sec_";
+const PBKDF2_ITERATIONS = 600000;
+const SESSION_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes
+
+let cryptoKey = null;
+let sessionTimerInterval = null;
+let sessionExpiry = 0;
+let failedAttempts = 0;
+const MAX_ATTEMPTS = 5;
+const LOCKOUT_MS = 60000;
+let lockoutUntil = 0;
+
+// --- Crypto helpers using Web Crypto API ---
+function str2buf(str) { return new TextEncoder().encode(str); }
+function buf2hex(buf) { return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2,"0")).join(""); }
+function hex2buf(hex) { return new Uint8Array(hex.match(/.{2}/g).map(b => parseInt(b, 16))); }
+function buf2base64(buf) { return btoa(String.fromCharCode(...new Uint8Array(buf))); }
+function base642buf(b64) { return Uint8Array.from(atob(b64), c => c.charCodeAt(0)); }
+
+async function deriveKey(password, salt) {
+  const keyMaterial = await crypto.subtle.importKey("raw", str2buf(password), "PBKDF2", false, ["deriveKey"]);
+  return crypto.subtle.deriveKey(
+    { name: "PBKDF2", salt, iterations: PBKDF2_ITERATIONS, hash: "SHA-256" },
+    keyMaterial,
+    { name: "AES-GCM", length: 256 },
+    false,
+    ["encrypt", "decrypt"]
+  );
+}
+
+async function hashPassword(password, salt) {
+  const key = await crypto.subtle.importKey("raw", str2buf(password), "PBKDF2", false, ["deriveBits"]);
+  const bits = await crypto.subtle.deriveBits(
+    { name: "PBKDF2", salt, iterations: PBKDF2_ITERATIONS, hash: "SHA-256" },
+    key, 256
+  );
+  return buf2hex(bits);
+}
+
+async function encryptData(plaintext, key) {
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const encrypted = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, str2buf(plaintext));
+  return { iv: buf2base64(iv), data: buf2base64(encrypted) };
+}
+
+async function decryptData(cipherObj, key) {
+  const iv = base642buf(cipherObj.iv);
+  const data = base642buf(cipherObj.data);
+  const decrypted = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, data);
+  return new TextDecoder().decode(decrypted);
+}
+
+// --- Password strength ---
+function getPasswordStrength(pw) {
+  let score = 0;
+  if (pw.length >= 6) score++;
+  if (pw.length >= 10) score++;
+  if (/[A-Z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw)) score++;
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+  return Math.min(score, 5);
+}
+
+function updateStrengthBar(pw) {
+  const fill = document.getElementById("pwStrengthFill");
+  const strength = getPasswordStrength(pw);
+  const pct = (strength / 5) * 100;
+  const colors = ["#c62828","#ef6c00","#f9a825","#7cb342","#2e7d32"];
+  fill.style.width = pct + "%";
+  fill.style.background = colors[Math.max(0, strength - 1)] || "#c62828";
+}
+
+// --- Check if password exists ---
+function isPasswordSet() {
+  return localStorage.getItem(SEC_PREFIX + "hash") !== null;
+}
+
+// --- UI Setup ---
+function setupLoginUI() {
+  const isSetup = !isPasswordSet();
+  document.getElementById("loginTitle").textContent = isSetup ? "Create Password" : "🔐 Unlock Album";
+  document.getElementById("loginSubtitle").textContent = isSetup
+    ? "Protect Facundo's album with a password"
+    : "Enter your password to access the album";
+  document.getElementById("confirmWrap").style.display = isSetup ? "block" : "none";
+  document.getElementById("loginBtn").textContent = isSetup ? "🔐 Set Password" : "⚽ Unlock";
+  document.getElementById("loginError").textContent = "";
+  document.getElementById("loginPassword").value = "";
+  if (document.getElementById("loginConfirm")) document.getElementById("loginConfirm").value = "";
+  document.getElementById("loginScreen").classList.remove("hidden");
+  document.getElementById("appContent").classList.remove("unlocked");
+  document.getElementById("sessionBar").classList.add("hidden");
+  document.getElementById("loginPassword").focus();
+}
+
+// --- Handle Login / Password Creation ---
+async function handleLogin() {
+  const pw = document.getElementById("loginPassword").value;
+  const errorEl = document.getElementById("loginError");
+  const btn = document.getElementById("loginBtn");
+
+  // Lockout check
+  if (Date.now() < lockoutUntil) {
+    const secs = Math.ceil((lockoutUntil - Date.now()) / 1000);
+    errorEl.textContent = `Too many attempts. Wait ${secs}s...`;
+    return;
+  }
+
+  if (!pw || pw.length < 4) {
+    errorEl.textContent = "Password must be at least 4 characters";
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = "🔄 Processing...";
+
+  try {
+    if (!isPasswordSet()) {
+      // === CREATE PASSWORD ===
+      const confirm = document.getElementById("loginConfirm").value;
+      if (pw !== confirm) {
+        errorEl.textContent = "Passwords don't match";
+        btn.disabled = false;
+        btn.textContent = "🔐 Set Password";
+        return;
+      }
+      if (getPasswordStrength(pw) < 2) {
+        errorEl.textContent = "Password too weak — use 6+ chars with mixed types";
+        btn.disabled = false;
+        btn.textContent = "🔐 Set Password";
+        return;
+      }
+
+      const salt = crypto.getRandomValues(new Uint8Array(16));
+      const hash = await hashPassword(pw, salt);
+      const key = await deriveKey(pw, salt);
+
+      // Encrypt existing album data
+      const plaintext = JSON.stringify(albumState);
+      const encrypted = await encryptData(plaintext, key);
+
+      localStorage.setItem(SEC_PREFIX + "salt", buf2base64(salt));
+      localStorage.setItem(SEC_PREFIX + "hash", hash);
+      localStorage.setItem(SEC_PREFIX + "data", JSON.stringify(encrypted));
+      localStorage.removeItem(STORAGE_KEY); // Remove unencrypted data
+
+      cryptoKey = key;
+      unlockApp();
+      showToast("🔐 Password set! Your album is now encrypted.");
+
+    } else {
+      // === UNLOCK ===
+      const salt = base642buf(localStorage.getItem(SEC_PREFIX + "salt"));
+      const storedHash = localStorage.getItem(SEC_PREFIX + "hash");
+      const hash = await hashPassword(pw, salt);
+
+      if (hash !== storedHash) {
+        failedAttempts++;
+        if (failedAttempts >= MAX_ATTEMPTS) {
+          lockoutUntil = Date.now() + LOCKOUT_MS;
+          failedAttempts = 0;
+          errorEl.textContent = `Too many failed attempts. Locked for 60s.`;
+        } else {
+          errorEl.textContent = `Wrong password (${MAX_ATTEMPTS - failedAttempts} attempts left)`;
+        }
+        btn.disabled = false;
+        btn.textContent = "⚽ Unlock";
+        return;
+      }
+
+      failedAttempts = 0;
+      const key = await deriveKey(pw, salt);
+      const encryptedStr = localStorage.getItem(SEC_PREFIX + "data");
+
+      if (encryptedStr) {
+        const encrypted = JSON.parse(encryptedStr);
+        const plaintext = await decryptData(encrypted, key);
+        albumState = JSON.parse(plaintext);
+        // Merge with defaults
+        const def = defaultState();
+        Object.keys(def).forEach(k => { if (!albumState[k]) albumState[k] = def[k]; });
+      }
+
+      cryptoKey = key;
+      unlockApp();
+      showToast("⚽ Album unlocked!");
+    }
+  } catch (err) {
+    errorEl.textContent = "Decryption failed — wrong password or corrupted data";
+    btn.disabled = false;
+    btn.textContent = isPasswordSet() ? "⚽ Unlock" : "🔐 Set Password";
+  }
+}
+
+function unlockApp() {
+  document.getElementById("loginScreen").classList.add("hidden");
+  document.getElementById("appContent").classList.add("unlocked");
+  document.getElementById("sessionBar").classList.remove("hidden");
+  document.getElementById("loginBtn").disabled = false;
+  render();
+  startSessionTimer();
+}
+
+function lockApp() {
+  cryptoKey = null;
+  stopSessionTimer();
+  document.getElementById("appContent").classList.remove("unlocked");
+  document.getElementById("sessionBar").classList.add("hidden");
+  setupLoginUI();
+  showToast("🔒 Album locked");
+}
+
+// --- Encrypted save (overrides original saveState) ---
+const _originalSaveState = saveState;
+saveState = async function() {
+  if (!cryptoKey) { _originalSaveState(); return; }
+  try {
+    const plaintext = JSON.stringify(albumState);
+    const encrypted = await encryptData(plaintext, cryptoKey);
+    localStorage.setItem(SEC_PREFIX + "data", JSON.stringify(encrypted));
+    localStorage.removeItem(STORAGE_KEY); // Ensure no plaintext
+  } catch(e) {
+    console.error("Encryption save failed, falling back to plaintext", e);
+    _originalSaveState();
+  }
+};
+
+// --- Session Timer (15 min auto-lock) ---
+function startSessionTimer() {
+  sessionExpiry = Date.now() + SESSION_TIMEOUT_MS;
+  stopSessionTimer();
+  sessionTimerInterval = setInterval(updateSessionTimer, 1000);
+  // Reset on activity
+  ["click","keydown","mousemove","touchstart"].forEach(evt => {
+    document.addEventListener(evt, resetSessionTimer, { passive: true });
+  });
+}
+
+function stopSessionTimer() {
+  if (sessionTimerInterval) clearInterval(sessionTimerInterval);
+  ["click","keydown","mousemove","touchstart"].forEach(evt => {
+    document.removeEventListener(evt, resetSessionTimer);
+  });
+}
+
+function resetSessionTimer() {
+  sessionExpiry = Date.now() + SESSION_TIMEOUT_MS;
+}
+
+function updateSessionTimer() {
+  const remaining = Math.max(0, sessionExpiry - Date.now());
+  const mins = Math.floor(remaining / 60000);
+  const secs = Math.floor((remaining % 60000) / 1000);
+  document.getElementById("sessionTimer").textContent = `${mins}:${secs.toString().padStart(2,"0")}`;
+  if (remaining <= 0) lockApp();
+}
+
+// --- Change Password ---
+async function changePassword() {
+  const newPw = prompt("Enter NEW password (min 4 chars):");
+  if (!newPw || newPw.length < 4) { showToast("⚠️ Password too short"); return; }
+  const confirmPw = prompt("Confirm NEW password:");
+  if (newPw !== confirmPw) { showToast("⚠️ Passwords don't match"); return; }
+
+  try {
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    const hash = await hashPassword(newPw, salt);
+    const key = await deriveKey(newPw, salt);
+    const plaintext = JSON.stringify(albumState);
+    const encrypted = await encryptData(plaintext, key);
+
+    localStorage.setItem(SEC_PREFIX + "salt", buf2base64(salt));
+    localStorage.setItem(SEC_PREFIX + "hash", hash);
+    localStorage.setItem(SEC_PREFIX + "data", JSON.stringify(encrypted));
+    localStorage.removeItem(STORAGE_KEY);
+
+    cryptoKey = key;
+    showToast("🔑 Password changed successfully!");
+  } catch(e) {
+    showToast("⚠️ Failed to change password");
+  }
+}
+
+// --- Toggle password visibility ---
+function togglePasswordVisibility() {
+  const input = document.getElementById("loginPassword");
+  input.type = input.type === "password" ? "text" : "password";
+}
+
+// --- Enter key on password fields ---
+document.getElementById("loginPassword").addEventListener("keydown", function(e) {
+  if (e.key === "Enter") handleLogin();
+});
+document.getElementById("loginPassword").addEventListener("input", function() {
+  if (!isPasswordSet()) updateStrengthBar(this.value);
+});
+
+// ============================================================
+// INIT — Security-aware boot
+// ============================================================
+(function init() {
+  // If password is set, show login. Otherwise show setup.
+  // App content stays hidden until unlocked.
+  setupLoginUI();
+
+  // Migrate existing unencrypted data: if there's old STORAGE_KEY data
+  // but no encrypted data, load it so first password setup encrypts it.
+  if (!isPasswordSet()) {
+    const oldData = localStorage.getItem(STORAGE_KEY);
+    if (oldData) {
+      try { albumState = JSON.parse(oldData); } catch(e) {}
+      const def = defaultState();
+      Object.keys(def).forEach(k => { if (!albumState[k]) albumState[k] = def[k]; });
+    }
+  }
+})();
+</script>
+</div><!-- /appContent -->
+</body>
+</html>
