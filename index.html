@@ -671,6 +671,112 @@
   }
   .pw-field-wrap { position: relative; margin-bottom: 12px; }
   .pw-field-wrap input { margin-bottom: 0; }
+
+  /* ===== BACKEND SYNC PANEL ===== */
+  .sync-panel {
+    position: fixed;
+    top: 0; right: 0; bottom: 0;
+    width: 360px;
+    max-width: 100vw;
+    background: var(--card-bg);
+    border-left: 2px solid var(--gold);
+    z-index: 400;
+    padding: 28px 24px;
+    overflow-y: auto;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    box-shadow: -8px 0 40px rgba(0,0,0,0.5);
+  }
+  .sync-panel.open { transform: translateX(0); }
+  .sync-panel h3 {
+    font-family: 'Russo One', sans-serif;
+    color: var(--gold);
+    margin-bottom: 6px;
+    font-size: 1.1rem;
+  }
+  .sync-panel .sync-subtitle {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+  .sync-field-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+    display: block;
+  }
+  .sync-input {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 2px solid var(--card-border);
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    outline: none;
+    margin-bottom: 14px;
+    transition: border-color 0.2s;
+  }
+  .sync-input:focus { border-color: var(--gold); }
+  .sync-input::placeholder { color: var(--text-secondary); }
+  .sync-btn {
+    width: 100%;
+    padding: 11px;
+    border-radius: 10px;
+    border: none;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    margin-bottom: 10px;
+  }
+  .sync-btn:hover { opacity: 0.85; }
+  .sync-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .sync-btn.primary { background: var(--pitch-green); color: white; }
+  .sync-btn.secondary { background: #1565c0; color: white; }
+  .sync-btn.close-btn { background: #424242; color: white; }
+  .sync-status {
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    margin-bottom: 14px;
+    display: none;
+    line-height: 1.4;
+  }
+  .sync-status.show { display: block; }
+  .sync-status.ok  { background: rgba(27,94,32,0.4); border: 1px solid #4caf50; color: #a5d6a7; }
+  .sync-status.err { background: rgba(183,28,28,0.4); border: 1px solid #ef5350; color: #ef9a9a; }
+  .sync-status.info { background: rgba(21,101,192,0.4); border: 1px solid #42a5f5; color: #90caf9; }
+  .sync-divider {
+    border: none;
+    border-top: 1px solid var(--card-border);
+    margin: 20px 0;
+  }
+  .sync-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.72rem;
+    cursor: pointer;
+    padding: 3px 8px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+  }
+  .sync-indicator:hover { border-color: var(--gold); color: var(--gold); }
+  .sync-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--text-secondary);
+    flex-shrink: 0;
+  }
+  .sync-dot.connected { background: #4caf50; box-shadow: 0 0 6px #4caf50; }
+  .sync-dot.syncing { background: #ff9800; animation: pulse 1s infinite; }
+  .sync-dot.error { background: #ef5350; }
+  @keyframes pulse { 0%,100%{ opacity:1; } 50%{ opacity:0.3; } }
 </style>
 </head>
 <body>
@@ -700,10 +806,45 @@
 <!-- ===== SESSION BAR ===== -->
 <div class="session-bar hidden" id="sessionBar">
   <span>🔒 Encrypted session · Auto-lock in <span id="sessionTimer">15:00</span></span>
-  <div style="display:flex;gap:8px;">
+  <div style="display:flex;gap:8px;align-items:center;">
+    <span class="sync-indicator" onclick="openSyncPanel()" title="Cloud sync settings">
+      <span class="sync-dot" id="syncDot"></span>
+      <span id="syncLabel">Cloud Sync</span>
+    </span>
     <button onclick="changePassword()">🔑 Change Password</button>
     <button onclick="lockApp()">🔒 Lock Now</button>
   </div>
+</div>
+
+<!-- ===== BACKEND SYNC PANEL ===== -->
+<div class="sync-panel" id="syncPanel">
+  <h3>☁️ Cloud Sync</h3>
+  <p class="sync-subtitle">Connect to your deployed Express backend to sync your album across devices. Data is sent as plain sticker states (not encrypted blobs).</p>
+
+  <label class="sync-field-label">Backend URL</label>
+  <input class="sync-input" id="syncUrl" type="url" placeholder="https://your-app.onrender.com" />
+
+  <label class="sync-field-label">Album ID</label>
+  <input class="sync-input" id="syncAlbumId" placeholder="Paste album ID from POST /api/albums" />
+
+  <div class="sync-status" id="syncStatus"></div>
+
+  <button class="sync-btn secondary" onclick="syncTestConnection()">🔍 Test Connection</button>
+  <button class="sync-btn secondary" onclick="syncCreateAlbum()">➕ Create New Album on Server</button>
+
+  <hr class="sync-divider">
+
+  <button class="sync-btn primary" onclick="syncPullFromServer()">⬇️ Pull from Server (overwrite local)</button>
+  <button class="sync-btn primary" onclick="syncPushToServer()">⬆️ Push to Server (overwrite remote)</button>
+
+  <hr class="sync-divider">
+
+  <label class="sync-field-label" style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+    <input type="checkbox" id="syncAutoSync" onchange="syncToggleAuto(this)"> Auto-sync on every sticker change
+  </label>
+
+  <hr class="sync-divider">
+  <button class="sync-btn close-btn" onclick="closeSyncPanel()">✖ Close</button>
 </div>
 
 <!-- ===== APP CONTENT (hidden until unlocked) ===== -->
@@ -1208,6 +1349,7 @@ function setStatus(status) {
     document.getElementById("repeatRow").classList.remove("active");
   }
   saveState();
+  syncOnChange(selectedSticker);
   render();
   const statusNames = { missing: "❌ Missing", complete: "✅ Complete", repeated: "🔄 Repeated" };
   document.getElementById("modalCurrentStatus").innerHTML = `Current: <strong>${statusNames[status]}</strong>` + (status === "repeated" ? ` (×${albumState[selectedSticker].repeats})` : "");
@@ -1517,6 +1659,7 @@ function unlockApp() {
   document.getElementById("loginBtn").disabled = false;
   render();
   startSessionTimer();
+  syncLoadSettings();
 }
 
 function lockApp() {
@@ -1612,6 +1755,213 @@ document.getElementById("loginPassword").addEventListener("keydown", function(e)
 document.getElementById("loginPassword").addEventListener("input", function() {
   if (!isPasswordSet()) updateStrengthBar(this.value);
 });
+
+// ============================================================
+// BACKEND SYNC — optional cloud sync via Express API
+// ============================================================
+const SYNC_URL_KEY   = "fwc2026_sync_url";
+const SYNC_ID_KEY    = "fwc2026_sync_id";
+const SYNC_AUTO_KEY  = "fwc2026_sync_auto";
+
+let syncAutoEnabled = false;
+
+// ── Load persisted sync settings on boot ──
+function syncLoadSettings() {
+  const url   = localStorage.getItem(SYNC_URL_KEY) || "";
+  const id    = localStorage.getItem(SYNC_ID_KEY)  || "";
+  const auto  = localStorage.getItem(SYNC_AUTO_KEY) === "true";
+  document.getElementById("syncUrl").value      = url;
+  document.getElementById("syncAlbumId").value  = id;
+  document.getElementById("syncAutoSync").checked = auto;
+  syncAutoEnabled = auto;
+  syncUpdateDot(url && id ? "idle" : "off");
+}
+
+// ── Persist settings whenever inputs change ──
+function syncSaveSettings() {
+  const url = document.getElementById("syncUrl").value.trim().replace(/\/$/, "");
+  const id  = document.getElementById("syncAlbumId").value.trim();
+  const auto = document.getElementById("syncAutoSync").checked;
+  localStorage.setItem(SYNC_URL_KEY,  url);
+  localStorage.setItem(SYNC_ID_KEY,   id);
+  localStorage.setItem(SYNC_AUTO_KEY, auto);
+  syncAutoEnabled = auto;
+}
+
+document.getElementById("syncUrl").addEventListener("input",     syncSaveSettings);
+document.getElementById("syncAlbumId").addEventListener("input", syncSaveSettings);
+
+// ── Dot indicator: off | idle | syncing | connected | error ──
+function syncUpdateDot(state) {
+  const dot   = document.getElementById("syncDot");
+  const label = document.getElementById("syncLabel");
+  dot.className = "sync-dot";
+  if (state === "connected") { dot.classList.add("connected"); label.textContent = "Synced ✓"; }
+  else if (state === "syncing") { dot.classList.add("syncing");  label.textContent = "Syncing…"; }
+  else if (state === "error")   { dot.classList.add("error");    label.textContent = "Sync Error"; }
+  else if (state === "off")     { label.textContent = "Cloud Sync"; }
+  else                          { label.textContent = "Cloud Sync"; }
+}
+
+// ── Panel open/close ──
+function openSyncPanel()  {
+  syncLoadSettings();
+  document.getElementById("syncPanel").classList.add("open");
+}
+function closeSyncPanel() { document.getElementById("syncPanel").classList.remove("open"); }
+
+// ── Status messages inside panel ──
+function syncShowStatus(msg, type = "info") {
+  const el = document.getElementById("syncStatus");
+  el.textContent = msg;
+  el.className = `sync-status show ${type}`;
+}
+
+// ── Helpers ──
+function syncGetBase() { return (localStorage.getItem(SYNC_URL_KEY) || "").replace(/\/$/, ""); }
+function syncGetId()   { return localStorage.getItem(SYNC_ID_KEY)   || ""; }
+
+async function syncFetch(path, options = {}) {
+  const base = syncGetBase();
+  if (!base) throw new Error("No backend URL configured");
+  const res = await fetch(`${base}${path}`, {
+    headers: { "Content-Type": "application/json" },
+    ...options,
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+  return data;
+}
+
+// ── Convert albumState (local format) → array of {code, status, repeats} ──
+function albumStateToArray() {
+  return Object.entries(albumState).map(([code, v]) => ({
+    code,
+    status:  v.status  || "missing",
+    repeats: v.repeats || 0,
+  }));
+}
+
+// ── Convert server stickers array → albumState map ──
+function serverStickersToState(stickers) {
+  const state = {};
+  stickers.forEach(s => {
+    state[s.code] = { status: s.status || "missing", repeats: s.repeats || 0 };
+  });
+  return state;
+}
+
+// ── Test Connection ──
+async function syncTestConnection() {
+  const base = syncGetBase();
+  if (!base) { syncShowStatus("⚠️ Enter a backend URL first.", "err"); return; }
+  syncShowStatus("Testing…", "info");
+  try {
+    const data = await syncFetch("/health");
+    syncShowStatus(`✅ Connected! Service: ${data.service} · ${data.timestamp}`, "ok");
+    syncUpdateDot("connected");
+  } catch (e) {
+    syncShowStatus(`❌ ${e.message}`, "err");
+    syncUpdateDot("error");
+  }
+}
+
+// ── Create Album on Server ──
+async function syncCreateAlbum() {
+  const base = syncGetBase();
+  if (!base) { syncShowStatus("⚠️ Enter a backend URL first.", "err"); return; }
+  syncShowStatus("Creating album on server…", "info");
+  try {
+    const data = await syncFetch("/api/albums", {
+      method: "POST",
+      body: JSON.stringify({ name: "Facundo's FWC 2026 Album", owner: "Facundo" }),
+    });
+    document.getElementById("syncAlbumId").value = data.id;
+    syncSaveSettings();
+    syncShowStatus(`✅ Album created! ID: ${data.id} — ${data.totalStickers} stickers seeded.`, "ok");
+    syncUpdateDot("connected");
+  } catch (e) {
+    syncShowStatus(`❌ ${e.message}`, "err");
+    syncUpdateDot("error");
+  }
+}
+
+// ── Push local → server (bulk PATCH in chunks of 100) ──
+async function syncPushToServer() {
+  const id = syncGetId();
+  if (!id) { syncShowStatus("⚠️ No Album ID. Create or enter one.", "err"); return; }
+  syncShowStatus("Pushing to server…", "info");
+  syncUpdateDot("syncing");
+  try {
+    const all = albumStateToArray();
+    const CHUNK = 100;
+    for (let i = 0; i < all.length; i += CHUNK) {
+      const chunk = all.slice(i, i + CHUNK);
+      await syncFetch(`/api/albums/${id}/stickers`, {
+        method: "PATCH",
+        body: JSON.stringify({ stickers: chunk }),
+      });
+    }
+    syncShowStatus(`✅ Pushed ${all.length} stickers to server.`, "ok");
+    syncUpdateDot("connected");
+  } catch (e) {
+    syncShowStatus(`❌ Push failed: ${e.message}`, "err");
+    syncUpdateDot("error");
+  }
+}
+
+// ── Pull server → local (overwrites albumState) ──
+async function syncPullFromServer() {
+  const id = syncGetId();
+  if (!id) { syncShowStatus("⚠️ No Album ID. Create or enter one.", "err"); return; }
+  if (!confirm("⚠️ This will overwrite your local sticker data with the server version. Continue?")) return;
+  syncShowStatus("Pulling from server…", "info");
+  syncUpdateDot("syncing");
+  try {
+    const data = await syncFetch(`/api/albums/${id}/stickers`);
+    const serverState = serverStickersToState(data.stickers);
+    // Merge with defaults so new stickers are always present
+    const def = defaultState();
+    Object.keys(def).forEach(k => { if (!serverState[k]) serverState[k] = def[k]; });
+    albumState = serverState;
+    await saveState();
+    render();
+    syncShowStatus(`✅ Pulled ${data.count} stickers from server.`, "ok");
+    syncUpdateDot("connected");
+  } catch (e) {
+    syncShowStatus(`❌ Pull failed: ${e.message}`, "err");
+    syncUpdateDot("error");
+  }
+}
+
+// ── Toggle auto-sync ──
+function syncToggleAuto(checkbox) {
+  syncAutoEnabled = checkbox.checked;
+  syncSaveSettings();
+  syncShowStatus(
+    syncAutoEnabled ? "✅ Auto-sync enabled — every sticker change will push to server." : "ℹ️ Auto-sync disabled.",
+    syncAutoEnabled ? "ok" : "info"
+  );
+}
+
+// ── Auto-sync: push single sticker update after a change ──
+async function syncOnChange(code) {
+  if (!syncAutoEnabled) return;
+  const id = syncGetId();
+  if (!id) return;
+  const s = albumState[code];
+  if (!s) return;
+  syncUpdateDot("syncing");
+  try {
+    await syncFetch(`/api/albums/${id}/stickers`, {
+      method: "PATCH",
+      body: JSON.stringify({ stickers: [{ code, status: s.status, repeats: s.repeats || 0 }] }),
+    });
+    syncUpdateDot("connected");
+  } catch (_) {
+    syncUpdateDot("error");
+  }
+}
 
 // ============================================================
 // INIT — Security-aware boot
