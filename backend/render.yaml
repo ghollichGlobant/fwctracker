@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: fwc2026-backend
+    runtime: node
+    region: oregon
+    plan: free
+    rootDir: .
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: PORT
+        value: 3000
+      - key: FIREBASE_SERVICE_ACCOUNT
+        sync: false   # Set manually in Render dashboard — paste your service account JSON here
+    healthCheckPath: /health
+
