@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'none'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://fwctracker.onrender.com http://localhost:3000; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta http-equiv="X-Frame-Options" content="DENY">
 <meta name="referrer" content="no-referrer">
@@ -806,7 +806,7 @@
 <!-- ===== SESSION BAR ===== -->
 <div class="session-bar hidden" id="sessionBar">
   <span>🔒 Encrypted session · Auto-lock in <span id="sessionTimer">15:00</span></span>
-  <div style="display:flex;gap:8px;align-items:center;">
+  <div style="display:flex;gap:8px;flex-wrap:wrap;">
     <span class="sync-indicator" onclick="openSyncPanel()" title="Cloud sync settings">
       <span class="sync-dot" id="syncDot"></span>
       <span id="syncLabel">Cloud Sync</span>
@@ -990,7 +990,7 @@ const GROUPS = [
       { code: "BRA", name: "Brazil", flag: "🇧🇷", players: ["Alisson","Danilo","Marquinhos","Gabriel Magalhães","Abner","Éder Militão","Bruno Guimarães","Lucas Paquetá","Vinícius Jr.","Rodrygo","Raphinha","Team Photo","Endrick","Estêvão","Savinho","Igor Jesus","Luiz Henrique","André","Matheuzinho"] },
       { code: "MAR", name: "Morocco", flag: "🇲🇦", players: ["Yassine Bounou","Achraf Hakimi","Nayef Aguerd","Romain Saïss","Noussair Mazraoui","Adam Aznou","Sofyan Amrabat","Hakim Ziyech","Azzedine Ounahi","Ilias Akhomach","Ibrahim Díaz","Team Photo","Youssef En-Nesyri","Ayoub El Kaabi","Bilal El Khannouss","Eliesse Ben Seghir","Ez Abde","Amir Richardson","Abdessamad Ezzalzouli"] },
       { code: "HAI", name: "Haiti", flag: "🇭🇹", players: ["Alexandre Pierre","Carlens Arcus","Jean-Sylvain Babin","Kevin Lafrance","Mikaël Gabriel","Bryan Alcéus","Derrick Étienne Jr.","Oalex Anderson","Leverton Pierre","Frantzdy Pierrot","Duckens Nazon","Team Photo","Mondy Prunier","Danley Jean-Jacques","Steeven Saba","Ricardo Adé","Christiano François","Nelson Bonhomme","Ronaldo Damus"] },
-      { code: "SCO", name: "Scotland", flag: "🏴󠁧󠁢󠁳󠁣󠁴󠁿", players: ["Angus Gunn","Anthony Ralston","Grant Hanley","John Souttar","Andrew Robertson","Scott McKenna","John McGinn","Callum McGregor","Scott McTominay","Billy Gilmour","Ryan Christie","Team Photo","Che Adams","Lyndon Dykes","Lawrence Shankland","Lewis Morgan","Kenny McLean","Ben Doak","Tommy Conway"] },
+      { code: "SCO", name: "Scotland", flag: "🏴", players: ["Angus Gunn","Anthony Ralston","Grant Hanley","John Souttar","Andrew Robertson","Scott McKenna","John McGinn","Callum McGregor","Scott McTominay","Billy Gilmour","Ryan Christie","Team Photo","Che Adams","Lyndon Dykes","Lawrence Shankland","Lewis Morgan","Kenny McLean","Ben Doak","Tommy Conway"] },
     ]
   },
   {
@@ -1068,7 +1068,7 @@ const GROUPS = [
   {
     name: "Group L",
     teams: [
-      { code: "ENG", name: "England", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", players: ["Jordan Pickford","Kyle Walker","John Stones","Harry Maguire","Luke Shaw","Marc Guéhi","Declan Rice","Jude Bellingham","Phil Foden","Bukayo Saka","Cole Palmer","Team Photo","Harry Kane","Ollie Watkins","Anthony Gordon","Trent Alexander-Arnold","Kobbie Mainoo","Morgan Gibbs-White","Levi Colwill"] },
+      { code: "ENG", name: "England", flag: "🏴", players: ["Jordan Pickford","Kyle Walker","John Stones","Harry Maguire","Luke Shaw","Marc Guéhi","Declan Rice","Jude Bellingham","Phil Foden","Bukayo Saka","Cole Palmer","Team Photo","Harry Kane","Ollie Watkins","Anthony Gordon","Trent Alexander-Arnold","Kobbie Mainoo","Morgan Gibbs-White","Levi Colwill"] },
       { code: "CRO", name: "Croatia", flag: "🇭🇷", players: ["Dominik Livaković","Josip Stanišić","Joško Gvardiol","Duje Ćaleta-Car","Borna Sosa","Josip Šutalo","Luka Modrić","Mateo Kovačić","Marcelo Brozović","Mario Pašalić","Lovro Majer","Team Photo","Andrej Kramarić","Bruno Petković","Igor Matanović","Luka Sučić","Martin Baturina","Ante Budimir","Mislav Oršić"] },
       { code: "GHA", name: "Ghana", flag: "🇬🇭", players: ["Lawrence Ati-Zigi","Tariq Lamptey","Mohammed Salisu","Daniel Amartey","Gideon Mensah","Alexander Djiku","Thomas Partey","Mohammed Kudus","Elisha Owusu","Ibrahim Sulemana","Fatawu Issahaku","Team Photo","Jordan Ayew","Inaki Williams","Antoine Semenyo","Ernest Nuamah","Osman Bukari","Abdul-Samed Salis","Kamaldeen Sulemana"] },
       { code: "PAN", name: "Panama", flag: "🇵🇦", players: ["Luis Mejía","Michael Murillo","Fidel Escobar","Andrés Andrade","Eric Davis","Harold Cummings","Anibal Godoy","Adalberto Carrasquilla","Alberto Quintero","Éric Davis","José Fajardo","Team Photo","Gabriel Torres","Freddy Góndola","Cecilio Waterman","Édgar Bárcenas","Ismael Díaz","César Yanis","José Luis Rodríguez"] },
