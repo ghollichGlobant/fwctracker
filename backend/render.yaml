@@ -4,9 +4,9 @@ services:
     runtime: node
     region: oregon
     plan: free
-    rootDir: .
     buildCommand: npm install
     startCommand: npm start
+    workingDirectory: backend
     envVars:
       - key: PORT
         value: 3000
