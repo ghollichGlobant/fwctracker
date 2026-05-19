@@ -6,7 +6,9 @@
   "type": "module",
   "scripts": {
     "start": "node src/index.js",
-    "dev": "node --watch src/index.js"
+    "dev": "node --watch src/index.js",
+    "sync:csv:dry": "node scripts/sync-missing-from-csv.mjs --csv \"../inputs/to complete fwctracker.csv\" --dry-run",
+    "sync:csv": "node scripts/sync-missing-from-csv.mjs"
   },
   "dependencies": {
     "cors": "^2.8.5",

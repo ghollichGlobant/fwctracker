@@ -12,24 +12,24 @@
   @import url('https://fonts.googleapis.com/css2?family=Russo+One&family=Inter:wght@400;500;600;700&display=swap');
 
   :root {
-    --pitch-green: #1b5e20;
-    --pitch-light: #2e7d32;
-    --pitch-dark: #0d3b11;
-    --gold: #ffd600;
+    --pitch-green: #4db8ff;
+    --pitch-light: #8ed6ff;
+    --pitch-dark: #0d2233;
+    --gold: #ffd60a;
     --gold-dark: #c7a500;
     --white: #ffffff;
-    --missing-bg: #37474f;
-    --missing-border: #546e7a;
+    --missing-bg: #1b2a38;
+    --missing-border: #3d5970;
     --complete-bg: #1b5e20;
     --complete-border: #4caf50;
-    --repeated-bg: #e65100;
-    --repeated-border: #ff9800;
-    --card-bg: #1a1a2e;
-    --card-border: #2a2a4a;
-    --bg-dark: #0f0f1a;
-    --text-primary: #e0e0e0;
-    --text-secondary: #9e9e9e;
-    --foil-gradient: linear-gradient(135deg, #ffd700, #ffec8b, #ffd700, #daa520);
+    --repeated-bg: #b68b00;
+    --repeated-border: #ffd60a;
+    --card-bg: #101820;
+    --card-border: #2a3b4d;
+    --bg-dark: #060b11;
+    --text-primary: #f5fbff;
+    --text-secondary: #b6c7d8;
+    --foil-gradient: linear-gradient(135deg, #ffd60a, #fff2a8, #ffd60a, #c7a500);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -79,14 +79,6 @@
     font-weight: 700;
     font-size: 0.8rem;
     letter-spacing: 0.5px;
-  }
-  .ball-icon {
-    font-size: 2rem;
-    animation: spin 4s linear infinite;
-  }
-  @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
   }
 
   /* STATS BAR */
@@ -205,6 +197,8 @@
   .action-btn:hover { background: var(--pitch-light); }
   .action-btn.danger { border-color: #c62828; background: #c62828; }
   .action-btn.danger:hover { background: #e53935; }
+  .action-btn.share { border-color: #1565c0; background: #1565c0; }
+  .action-btn.share:hover { background: #1976d2; }
 
   /* MAIN */
   .main {
@@ -363,12 +357,9 @@
     border-width: 2px;
   }
   .sticker.foil.complete {
-    background: linear-gradient(135deg, #1b5e20, #2e7d32, #388e3c);
-    box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
-  }
-  .sticker.foil .sticker-code::after {
-    content: " ✨";
-    font-size: 0.6rem;
+    background: var(--complete-bg);
+    border-color: var(--complete-border);
+    box-shadow: none;
   }
 
   /* REPEATED COUNT BADGE */
@@ -864,6 +855,8 @@
       <button class="action-btn" onclick="exportData()">📤 Export</button>
       <button class="action-btn" onclick="document.getElementById('importFile').click()">📥 Import</button>
       <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+      <button class="action-btn share" onclick="openSharePage('missing')">📋 Share Missing</button>
+      <button class="action-btn share" onclick="openSharePage('repeated')">🔄 Share Repeated</button>
       <button class="action-btn danger" onclick="resetAll()">🗑️ Reset</button>
     </div>
   </div>
@@ -1443,6 +1436,174 @@ function resetAll() {
     render();
     showToast("🗑️ Album reset!");
   }
+}
+
+// ============================================================
+// SHARE PAGES (read-only, no auth)
+// ============================================================
+function openSharePage(type) {
+  // Collect stickers matching the type
+  const items = [];
+
+  // Special stickers
+  SPECIAL_STICKERS.forEach(s => {
+    const st = albumState[s.code] || { status: "missing", repeats: 0 };
+    if (st.status === type) {
+      items.push({ code: s.code, label: s.label, foil: s.foil, group: "FWC Special", team: "FIFA World Cup 2026", flag: "⭐", repeats: st.repeats });
+    }
+  });
+
+  // Team stickers
+  GROUPS.forEach(g => {
+    g.teams.forEach(t => {
+      for (let i = 1; i <= 20; i++) {
+        const code = `${t.code} ${i}`;
+        const st = albumState[code] || { status: "missing", repeats: 0 };
+        if (st.status === type) {
+          let label;
+          if (i === 1) label = "Team Badge";
+          else if (i === 13) label = "Team Photo";
+          else label = t.players[i - 2] || `Player ${i}`;
+          items.push({ code, label, foil: i === 1, group: g.name, team: t.name, flag: t.flag, repeats: st.repeats });
+        }
+      }
+    });
+  });
+
+  if (items.length === 0) {
+    showToast(type === "missing" ? "🎉 No missing stickers — album complete!" : "ℹ️ No repeated stickers yet");
+    return;
+  }
+
+  // Group items by group → team
+  const grouped = {};
+  items.forEach(it => {
+    const key = it.group;
+    if (!grouped[key]) grouped[key] = {};
+    const tKey = `${it.flag} ${it.team}`;
+    if (!grouped[key][tKey]) grouped[key][tKey] = [];
+    grouped[key][tKey].push(it);
+  });
+
+  const isMissing = type === "missing";
+  const title = isMissing ? "📋 Facundo's Missing Stickers" : "🔄 Facundo's Repeated Stickers";
+  const subtitle = isMissing ? "I need these stickers — can you help?" : "I have extras of these — want to trade?";
+  const accentColor = isMissing ? "#546e7a" : "#ff9800";
+  const accentBg = isMissing ? "#37474f" : "#e65100";
+  const totalRepeats = isMissing ? "" : ` (${items.reduce((s, it) => s + (it.repeats || 1), 0)} total copies)`;
+
+  let contentHtml = "";
+  Object.entries(grouped).forEach(([groupName, teams]) => {
+    const badge = groupName === "FWC Special" ? "⭐" : groupName.replace("Group ", "");
+    const groupCount = Object.values(teams).reduce((s, arr) => s + arr.length, 0);
+
+    let teamsHtml = "";
+    Object.entries(teams).forEach(([teamLabel, stickers]) => {
+      teamsHtml += `
+        <div style="margin-bottom:14px;">
+          <div style="font-weight:700;font-size:0.95rem;margin-bottom:8px;display:flex;align-items:center;gap:8px;color:#e0e0e0;">
+            ${teamLabel}
+            <span style="font-size:0.75rem;color:#9e9e9e;margin-left:auto;">${stickers.length} sticker${stickers.length > 1 ? "s" : ""}</span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px;">
+            ${stickers.map(s => {
+              const foilStar = s.foil ? " ✨" : "";
+              const repeatBadge = !isMissing && s.repeats > 0 ? `<span style="position:absolute;bottom:3px;right:5px;background:#ff6d00;color:white;font-size:0.55rem;font-weight:700;padding:1px 5px;border-radius:8px;">×${s.repeats}</span>` : "";
+              return `<div style="position:relative;border-radius:10px;padding:10px 6px;text-align:center;border:2px solid ${accentColor};background:${accentBg};min-height:72px;display:flex;flex-direction:column;align-items:center;justify-content:center;" title="${s.code} — ${s.label}">
+                <div style="font-family:'Russo One',sans-serif;font-size:0.75rem;margin-bottom:2px;">${s.code}${foilStar}</div>
+                <div style="font-size:0.6rem;color:rgba(255,255,255,0.7);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;">${s.label}</div>
+                ${repeatBadge}
+              </div>`;
+            }).join("")}
+          </div>
+        </div>
+      `;
+    });
+
+    contentHtml += `
+      <div style="margin-bottom:24px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:linear-gradient(135deg,#1a1a2e,#1e1e36);border:1px solid #2a2a4a;border-radius:14px 14px 0 0;">
+          <div style="font-family:'Russo One',sans-serif;font-size:1.1rem;display:flex;align-items:center;gap:10px;">
+            <span style="background:#ffd600;color:#0d3b11;padding:2px 10px;border-radius:6px;font-size:0.75rem;font-weight:700;">${badge}</span>
+            ⚽ ${groupName}
+          </div>
+          <span style="font-size:0.85rem;color:#9e9e9e;">${groupCount} sticker${groupCount > 1 ? "s" : ""}</span>
+        </div>
+        <div style="background:#1a1a2e;border:1px solid #2a2a4a;border-top:none;border-radius:0 0 14px 14px;padding:16px;">
+          ${teamsHtml}
+        </div>
+      </div>
+    `;
+  });
+
+  const now = new Date();
+  const dateStr = now.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+
+  const pageHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>${title} — FIFA World Cup 2026</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Russo+One&family=Inter:wght@400;500;600;700&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Inter',sans-serif;background:#0f0f1a;color:#e0e0e0;min-height:100vh;}
+  .header{background:linear-gradient(135deg,#0d3b11,#1b5e20,#0d3b11);border-bottom:4px solid #ffd600;padding:20px 24px;text-align:center;}
+  .header h1{font-family:'Russo One',sans-serif;font-size:1.6rem;color:white;text-shadow:2px 2px 4px rgba(0,0,0,0.5);margin-bottom:4px;}
+  .header p{color:rgba(255,255,255,0.8);font-size:0.9rem;}
+  .summary{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;padding:16px 24px;max-width:1400px;margin:0 auto;}
+  .summary-box{background:#1a1a2e;border:1px solid #2a2a4a;border-radius:12px;padding:12px 24px;text-align:center;min-width:120px;}
+  .summary-box .val{font-family:'Russo One',sans-serif;font-size:1.5rem;color:${accentColor};}
+  .summary-box .lbl{font-size:0.75rem;color:#9e9e9e;margin-top:2px;}
+  .main{max-width:1400px;margin:0 auto;padding:16px 24px 60px;}
+  .footer{text-align:center;padding:24px;color:#9e9e9e;font-size:0.75rem;border-top:1px solid #2a2a4a;}
+  .print-btn{display:inline-block;margin:12px auto;padding:10px 24px;border-radius:10px;border:2px solid #1565c0;background:#1565c0;color:white;font-size:0.85rem;font-weight:600;cursor:pointer;transition:all 0.2s;}
+  .print-btn:hover{background:#1976d2;}
+  @media print{.no-print{display:none!important;}.header{break-after:avoid;}}
+  @media(max-width:768px){.header h1{font-size:1.1rem;}}
+</style>
+</head>
+<body>
+<header class="header">
+  <h1>${title}</h1>
+  <p>${subtitle}</p>
+  <p style="margin-top:8px;font-size:0.75rem;color:rgba(255,255,255,0.5);">· Generated on ${dateStr} · </p>
+  <div class="no-print" style="margin-top:12px;">
+    <button class="print-btn" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  </div>
+</header>
+
+<div class="summary">
+  <div class="summary-box">
+    <div class="val">${items.length}</div>
+    <div class="lbl">${isMissing ? "Missing" : "Repeated"} Stickers${totalRepeats}</div>
+  </div>
+  <div class="summary-box">
+    <div class="val">${Object.keys(grouped).length}</div>
+    <div class="lbl">Groups</div>
+  </div>
+  <div class="summary-box">
+    <div class="val">${Object.values(grouped).reduce((s, teams) => s + Object.keys(teams).length, 0)}</div>
+    <div class="lbl">Teams</div>
+  </div>
+</div>
+
+<div class="main">
+  ${contentHtml}
+</div>
+
+<footer class="footer">
+  ⚽ ⚽ ⚽ Sticker Album — Owner: Facundo Hollich — 980 Stickers · 48 Teams · 12 Groups ⚽ ⚽ ⚽<br>
+  This is a read-only list — ${isMissing ? "help me complete my album!" : "let's trade!"} 🤝
+</footer>
+</body>
+</html>`;
+
+  const blob = new Blob([pageHtml], { type: "text/html" });
+  const url = URL.createObjectURL(blob);
+  window.open(url, "_blank");
+  showToast(`📤 ${isMissing ? "Missing" : "Repeated"} stickers page opened!`);
 }
 
 // ============================================================
