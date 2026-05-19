@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://fwctracker.onrender.com http://localhost:3000; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';">
+<title>🔐 Manage Album — Facundo's FIFA World Cup 2026</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Russo+One&family=Inter:wght@400;500;600;700&display=swap');
+
+  :root {
+    --pitch-green: #4db8ff;
+    --pitch-light: #8ed6ff;
+    --pitch-dark: #0d2233;
+    --gold: #ffd60a;
+    --gold-dark: #c7a500;
+    --white: #ffffff;
+    --missing-bg: #1b2a38;
+    --missing-border: #3d5970;
+    --complete-bg: #1b5e20;
+    --complete-border: #4caf50;
+    --repeated-bg: #b68b00;
+    --repeated-border: #ffd60a;
+    --card-bg: #101820;
+    --card-border: #2a3b4d;
+    --bg-dark: #060b11;
+    --text-primary: #f5fbff;
+    --text-secondary: #b6c7d8;
+    --foil-gradient: linear-gradient(135deg, #ffd60a, #fff2a8, #ffd60a, #c7a500);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    min-height: 100vh;
+  }
+
+  /* LOGIN SCREEN */
+  #appContent { display: none; }
+  #appContent.unlocked { display: block; }
+
+  .login-screen {
+    position: fixed; inset: 0;
+    background: var(--bg-dark);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+  .login-screen.hidden { display: none; }
+
+  .login-card {
+    background: var(--card-bg);
+    border: 2px solid var(--gold);
+    border-radius: 20px;
+    padding: 40px 36px;
+    max-width: 420px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+  }
+  .login-card .login-ball { font-size: 3.5rem; margin-bottom: 12px; display: block; }
+  .login-card h2 {
+    font-family: 'Russo One', sans-serif;
+    font-size: 1.5rem;
+    color: var(--gold);
+    margin-bottom: 4px;
+  }
+  .login-card .login-subtitle {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    margin-bottom: 24px;
+  }
+  .login-card input[type="password"] {
+    width: 100%;
+    padding: 14px 18px;
+    border-radius: 12px;
+    border: 2px solid var(--card-border);
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    font-size: 1rem;
+    text-align: center;
+    letter-spacing: 4px;
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 12px;
+  }
+  .login-card input[type="password"]:focus { border-color: var(--gold); }
+  .login-card input[type="password"]::placeholder { letter-spacing: 1px; color: var(--text-secondary); }
+  .login-card .login-btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, var(--pitch-green), var(--pitch-light));
+    color: white;
+    font-family: 'Russo One', sans-serif;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    margin-bottom: 8px;
+  }
+  .login-card .login-btn:hover { opacity: 0.9; }
+  .login-error {
+    color: #ef5350;
+    font-size: 0.8rem;
+    min-height: 20px;
+    margin-top: 4px;
+  }
+  .login-card .home-link {
+    display: inline-block;
+    margin-top: 16px;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .login-card .home-link:hover { color: var(--gold); }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, var(--pitch-dark), var(--pitch-green), var(--pitch-dark));
+    border-bottom: 4px solid var(--gold);
+    padding: 20px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .header-title { display: flex; align-items: center; gap: 12px; }
+  .header-title h1 {
+    font-family: 'Russo One', sans-serif;
+    font-size: 1.6rem;
+    color: var(--white);
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  }
+  .header-title .owner-badge {
+    background: var(--gold);
+    color: var(--pitch-dark);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+  }
+
+  /* STATS BAR */
+  .stats-bar {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: 16px;
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .stat-box {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 8px 16px;
+    text-align: center;
+    min-width: 110px;
+  }
+  .stat-box .stat-value {
+    font-family: 'Russo One', sans-serif;
+    font-size: 1.4rem;
+    color: var(--gold);
+  }
+  .stat-box .stat-label {
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.7);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .stat-box.complete-stat .stat-value { color: #4caf50; }
+  .stat-box.repeated-stat .stat-value { color: #ff9800; }
+  .stat-box.missing-stat .stat-value { color: #78909c; }
+
+  .progress-bar-container {
+    flex: 1;
+    min-width: 200px;
+    background: rgba(0,0,0,0.4);
+    border-radius: 12px;
+    height: 28px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.1);
+    position: relative;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--pitch-green), #4caf50, var(--gold));
+    border-radius: 12px;
+    transition: width 0.5s ease;
+  }
+  .progress-bar-text {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+    z-index: 2;
+  }
+
+  /* TOOLBAR */
+  .toolbar {
+    max-width: 1400px;
+    margin: 16px auto;
+    padding: 0 24px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .search-box {
+    flex: 1;
+    min-width: 200px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: 2px solid var(--card-border);
+    background: var(--card-bg);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .search-box:focus { border-color: var(--gold); }
+  .search-box::placeholder { color: var(--text-secondary); }
+  .filter-btn {
+    padding: 10px 18px;
+    border-radius: 10px;
+    border: 2px solid var(--card-border);
+    background: var(--card-bg);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .filter-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .filter-btn.active { background: var(--gold); color: var(--pitch-dark); border-color: var(--gold); }
+  .action-btn {
+    padding: 10px 18px;
+    border-radius: 10px;
+    border: 2px solid var(--pitch-green);
+    background: var(--pitch-green);
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .action-btn:hover { background: var(--pitch-light); }
+  .action-btn.danger { border-color: #c62828; background: #c62828; }
+  .action-btn.danger:hover { background: #e53935; }
+
+  /* MAIN */
+  .main { max-width: 1400px; margin: 0 auto; padding: 0 24px 60px; }
+
+  /* SECTION */
+  .album-section { margin-bottom: 24px; }
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    background: linear-gradient(135deg, var(--card-bg), #1e2e3e);
+    border: 1px solid var(--card-border);
+    border-radius: 14px 14px 0 0;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s;
+  }
+  .section-header:hover { background: #182838; }
+  .section-header.collapsed + .section-body { display: none; }
+  .section-header .section-title {
+    font-family: 'Russo One', sans-serif;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-header .section-title .group-badge {
+    background: var(--gold);
+    color: var(--pitch-dark);
+    padding: 2px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+  .section-progress {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.85rem;
+  }
+  .section-progress-bar {
+    width: 120px;
+    height: 8px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .section-progress-fill {
+    height: 100%;
+    background: #4caf50;
+    border-radius: 4px;
+    transition: width 0.3s;
+  }
+  .chevron { transition: transform 0.3s; font-size: 1.2rem; }
+  .section-header.collapsed .chevron { transform: rotate(-90deg); }
+  .section-body {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-top: none;
+    border-radius: 0 0 14px 14px;
+    padding: 16px;
+  }
+
+  /* TEAM */
+  .team-block { margin-bottom: 16px; }
+  .team-block:last-child { margin-bottom: 0; }
+  .team-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-primary);
+  }
+  .team-name .flag { font-size: 1.3rem; }
+  .team-mini-progress { font-size: 0.75rem; color: var(--text-secondary); margin-left: auto; }
+
+  /* STICKER GRID */
+  .sticker-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 8px;
+  }
+  .sticker {
+    position: relative;
+    border-radius: 10px;
+    padding: 10px 6px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 2px solid;
+    user-select: none;
+    min-height: 72px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .sticker:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+  .sticker:active { transform: scale(0.96); }
+  .sticker.missing { background: var(--missing-bg); border-color: var(--missing-border); opacity: 0.6; }
+  .sticker.complete { background: var(--complete-bg); border-color: var(--complete-border); opacity: 1; }
+  .sticker.repeated { background: var(--repeated-bg); border-color: var(--repeated-border); opacity: 1; }
+  .sticker .sticker-code { font-family: 'Russo One', sans-serif; font-size: 0.75rem; margin-bottom: 2px; }
+  .sticker .sticker-label {
+    font-size: 0.6rem;
+    color: rgba(255,255,255,0.7);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+  }
+  .sticker .sticker-status-icon { position: absolute; top: 4px; right: 4px; font-size: 0.65rem; }
+  .sticker.foil { border-width: 2px; }
+  .sticker.foil.complete { background: var(--complete-bg); border-color: var(--complete-border); }
+  .sticker .repeat-count {
+    position: absolute;
+    bottom: 3px; right: 5px;
+    background: #ff6d00;
+    color: white;
+    font-size: 0.55rem;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 8px;
+    display: none;
+  }
+  .sticker.repeated .repeat-count { display: block; }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal {
+    background: var(--card-bg);
+    border: 2px solid var(--gold);
+    border-radius: 16px;
+    padding: 24px;
+    max-width: 400px;
+    width: 90%;
+  }
+  .modal h3 { font-family: 'Russo One', sans-serif; margin-bottom: 16px; color: var(--gold); }
+  .modal-actions { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+  .modal-actions button {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: opacity 0.2s;
+  }
+  .modal-actions button:hover { opacity: 0.85; }
+  .btn-missing { background: var(--missing-bg); color: white; border: 2px solid var(--missing-border) !important; }
+  .btn-complete { background: var(--complete-bg); color: white; border: 2px solid var(--complete-border) !important; }
+  .btn-repeated { background: var(--repeated-bg); color: white; border: 2px solid var(--repeated-border) !important; }
+  .btn-close { background: #424242; color: white; }
+  .repeat-input-row {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .repeat-input-row.active { display: flex; }
+  .repeat-input-row label { font-size: 0.85rem; color: var(--text-secondary); }
+  .repeat-input-row input {
+    width: 70px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 2px solid var(--card-border);
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    font-size: 1rem;
+    text-align: center;
+  }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    background: var(--pitch-green);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    z-index: 300;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  /* LEGEND */
+  .legend {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 12px 0;
+    margin-bottom: 12px;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: var(--text-secondary); }
+  .legend-dot { width: 14px; height: 14px; border-radius: 4px; border: 2px solid; }
+  .legend-dot.missing { background: var(--missing-bg); border-color: var(--missing-border); }
+  .legend-dot.complete { background: var(--complete-bg); border-color: var(--complete-border); }
+  .legend-dot.repeated { background: var(--repeated-bg); border-color: var(--repeated-border); }
+
+  /* LOADING / ERROR */
+  .page-loading, .page-error {
+    text-align: center;
+    padding: 60px 24px;
+    font-size: 1.1rem;
+  }
+  .page-loading { color: var(--text-secondary); }
+  .page-error { color: #ef5350; }
+  .page-error button {
+    margin-top: 16px;
+    padding: 10px 24px;
+    border-radius: 10px;
+    border: 2px solid var(--pitch-green);
+    background: var(--pitch-green);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .spinner {
+    display: inline-block;
+    width: 32px; height: 32px;
+    border: 3px solid rgba(255,255,255,0.2);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-bottom: 12px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .footer {
+    text-align: center;
+    padding: 24px;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    border-top: 1px solid var(--card-border);
+  }
+
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: var(--bg-dark); }
+  ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+
+  @media (max-width: 768px) {
+    .header-title h1 { font-size: 1.1rem; }
+    .stats-bar { gap: 8px; }
+    .stat-box { min-width: 80px; padding: 6px 10px; }
+    .stat-box .stat-value { font-size: 1.1rem; }
+    .sticker-grid { grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 6px; }
+    .sticker { padding: 8px 4px; min-height: 62px; }
+    .toolbar { padding: 0 12px; }
+    .main { padding: 0 12px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== PASSWORD GATE ===== -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <span class="login-ball">🔐</span>
+    <h2>Manage Album</h2>
+    <p class="login-subtitle">Enter password to access sticker management</p>
+    <input type="password" id="passwordInput" placeholder="Enter password" autocomplete="off">
+    <button class="login-btn" id="loginBtn" onclick="handleUnlock()">⚽ Unlock</button>
+    <div class="login-error" id="loginError"></div>
+    <a href="index.html" class="home-link">🏠 Back to Home</a>
+  </div>
+</div>
+
+<!-- ===== APP CONTENT ===== -->
+<div id="appContent">
+
+<header class="header">
+  <div class="header-top">
+    <div class="header-title">
+      <span>⚽</span>
+      <div>
+        <h1>Manage Album — FWC 2026</h1>
+        <span class="owner-badge">📋 Facundo's Album</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <a href="index.html" class="action-btn" style="text-decoration:none;">🏠 Home</a>
+      <button class="action-btn" onclick="exportData()">📤 Export</button>
+      <button class="action-btn" onclick="document.getElementById('importFile').click()">📥 Import</button>
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+      <button class="action-btn danger" onclick="resetAll()">🗑️ Reset</button>
+    </div>
+  </div>
+  <div class="stats-bar">
+    <div class="stat-box complete-stat">
+      <div class="stat-value" id="statComplete">0</div>
+      <div class="stat-label">Complete</div>
+    </div>
+    <div class="stat-box repeated-stat">
+      <div class="stat-value" id="statRepeated">0</div>
+      <div class="stat-label">Repeated</div>
+    </div>
+    <div class="stat-box missing-stat">
+      <div class="stat-value" id="statMissing">0</div>
+      <div class="stat-label">Missing</div>
+    </div>
+    <div class="progress-bar-container">
+      <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+      <div class="progress-bar-text" id="progressText">0 / 0 (0%)</div>
+    </div>
+  </div>
+</header>
+
+<div class="toolbar">
+  <input type="text" class="search-box" id="searchBox" placeholder="🔍 Search sticker, team, or player...">
+  <button class="filter-btn active" data-filter="all" onclick="setFilter('all',this)">All</button>
+  <button class="filter-btn" data-filter="missing" onclick="setFilter('missing',this)">Missing</button>
+  <button class="filter-btn" data-filter="complete" onclick="setFilter('complete',this)">Complete</button>
+  <button class="filter-btn" data-filter="repeated" onclick="setFilter('repeated',this)">Repeated</button>
+</div>
+
+<div class="main">
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot missing"></div> Missing</div>
+    <div class="legend-item"><div class="legend-dot complete"></div> Complete ✔️</div>
+    <div class="legend-item"><div class="legend-dot repeated"></div> Repeated 🔄</div>
+    <div class="legend-item" style="margin-left:auto;color:#aaa;">Click sticker to change status</div>
+  </div>
+  <div id="albumContent">
+    <div class="page-loading">
+      <div class="spinner"></div>
+      <div>Loading album…</div>
+    </div>
+  </div>
+</div>
+
+<!-- STICKER MODAL -->
+<div class="modal-overlay" id="stickerModal">
+  <div class="modal">
+    <h3 id="modalTitle">FWC 1</h3>
+    <p id="modalLabel" style="color:var(--text-secondary);margin-bottom:8px;font-size:0.9rem;"></p>
+    <p id="modalCurrentStatus" style="font-size:0.85rem;margin-bottom:4px;"></p>
+    <div class="modal-actions">
+      <button class="btn-missing" onclick="setStatus('missing')">❌ Missing</button>
+      <button class="btn-complete" onclick="setStatus('complete')">✅ Complete</button>
+      <button class="btn-repeated" onclick="setStatus('repeated')">🔄 Repeated</button>
+    </div>
+    <div class="repeat-input-row" id="repeatRow">
+      <label>How many duplicates?</label>
+      <input type="number" id="repeatCount" min="1" max="99" value="1" onchange="updateRepeatCount()">
+    </div>
+    <div class="modal-actions" style="margin-top:12px;">
+      <button class="btn-close" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<footer class="footer">
+  ⚽ Panini FIFA World Cup 2026™ Sticker Album Tracker — Owner: Facundo — 980 Stickers · 48 Teams · 12 Groups<br>
+  Data verified against official Panini sources · May 2026
+</footer>
+
+</div><!-- /appContent -->
+
+<script>
+// ============================================================
+// CONSTANTS
+// ============================================================
+const ALBUM_ID = "IH9Jdy8LImq5dXkKHLnh";
+const API_BASE = "https://fwctracker.onrender.com";
+const MANAGE_PASSWORD = "facu001";
+
+// ============================================================
+// STATE
+// ============================================================
+let albumState = {};   // { code: { status, repeats, label, team, teamName, flag, group, foil } }
+let rawStickers = [];  // original array from backend
+let currentFilter = "all";
+let currentSearch = "";
+let selectedSticker = null;
+let isUnlocked = false;
+
+// ============================================================
+// AUTH
+// ============================================================
+function handleUnlock() {
+  const input = document.getElementById("passwordInput").value;
+  if (input === MANAGE_PASSWORD) {
+    isUnlocked = true;
+    document.getElementById("loginScreen").classList.add("hidden");
+    document.getElementById("appContent").classList.add("unlocked");
+    loadAlbum();
+  } else {
+    document.getElementById("loginError").textContent = "❌ Wrong password";
+  }
+}
+document.getElementById("passwordInput").addEventListener("keydown", function(e) {
+  if (e.key === "Enter") handleUnlock();
+});
+
+// ============================================================
+// DATA LOADING
+// ============================================================
+async function loadAlbum() {
+  try {
+    const res = await fetch(`${API_BASE}/api/albums/${ALBUM_ID}/stickers`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    rawStickers = data.stickers || [];
+
+    albumState = {};
+    rawStickers.forEach(s => {
+      albumState[s.code] = {
+        status: s.status || "missing",
+        repeats: s.repeats || 0,
+        label: s.label || "",
+        team: s.team || "",
+        teamName: s.teamName || "",
+        flag: s.flag || "",
+        group: s.group || "",
+        foil: !!s.foil,
+      };
+    });
+
+    render();
+  } catch (err) {
+    document.getElementById("albumContent").innerHTML = `
+      <div class="page-error">
+        ❌ Failed to load album<br>
+        <small>${err.message}</small>
+        <br><button onclick="loadAlbum()">🔄 Retry</button>
+      </div>`;
+  }
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function render() {
+  const container = document.getElementById("albumContent");
+
+  // Build structured data from flat albumState
+  // 1. Special stickers (group === "Special")
+  // 2. Group stickers (group === "Group X") → teams
+  const specials = [];
+  const groupMap = {}; // { "Group A": { teams: { "MEX": { stickers: [...], teamName, flag } } } }
+
+  Object.entries(albumState).forEach(([code, s]) => {
+    if (s.group === "Special") {
+      specials.push({ code, label: s.label, foil: s.foil });
+    } else {
+      if (!groupMap[s.group]) groupMap[s.group] = {};
+      if (!groupMap[s.group][s.team]) groupMap[s.group][s.team] = { stickers: [], teamName: s.teamName, flag: s.flag };
+      groupMap[s.group][s.team].stickers.push({ code, label: s.label, foil: s.foil });
+    }
+  });
+
+  // Sort stickers numerically within each team
+  specials.sort((a, b) => {
+    const numA = parseInt(a.code.split(" ").pop()) || 0;
+    const numB = parseInt(b.code.split(" ").pop()) || 0;
+    return numA - numB;
+  });
+  Object.values(groupMap).forEach(teams => {
+    Object.values(teams).forEach(t => {
+      t.stickers.sort((a, b) => {
+        const numA = parseInt(a.code.split(" ").pop()) || 0;
+        const numB = parseInt(b.code.split(" ").pop()) || 0;
+        return numA - numB;
+      });
+    });
+  });
+
+  let html = "";
+
+  // Special Section
+  html += renderSection("⭐ FIFA World Cup 2026 — Special Stickers", specials);
+
+  // Group Sections in order
+  const groupOrder = ["Group A","Group B","Group C","Group D","Group E","Group F","Group G","Group H","Group I","Group J","Group K","Group L"];
+  groupOrder.forEach(groupName => {
+    const teams = groupMap[groupName];
+    if (!teams) return;
+    const teamBlocks = Object.entries(teams).map(([teamCode, teamData]) => ({
+      team: { code: teamCode, name: teamData.teamName, flag: teamData.flag },
+      stickers: teamData.stickers,
+    }));
+    html += renderGroupSection(groupName, teamBlocks);
+  });
+
+  container.innerHTML = html;
+  updateStats();
+}
+
+function renderSection(title, stickers) {
+  const filteredStickers = filterStickers(stickers);
+  if (currentSearch && filteredStickers.length === 0) return "";
+
+  const total = stickers.length;
+  const complete = stickers.filter(s => albumState[s.code]?.status === "complete" || albumState[s.code]?.status === "repeated").length;
+  const pct = total > 0 ? Math.round((complete / total) * 100) : 0;
+
+  return `
+    <div class="album-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-title">${title}</div>
+        <div class="section-progress">
+          <span>${complete}/${total}</span>
+          <div class="section-progress-bar"><div class="section-progress-fill" style="width:${pct}%"></div></div>
+          <span>${pct}%</span>
+          <span class="chevron">▾</span>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="sticker-grid">${filteredStickers.map(renderSticker).join("")}</div>
+      </div>
+    </div>`;
+}
+
+function renderGroupSection(groupName, teamBlocks) {
+  const allStickers = teamBlocks.flatMap(tb => tb.stickers);
+  const anyVisible = teamBlocks.some(tb => filterStickers(tb.stickers).length > 0);
+  if (currentSearch && !anyVisible) return "";
+
+  const total = allStickers.length;
+  const complete = allStickers.filter(s => albumState[s.code]?.status === "complete" || albumState[s.code]?.status === "repeated").length;
+  const pct = total > 0 ? Math.round((complete / total) * 100) : 0;
+
+  let teamsHtml = "";
+  teamBlocks.forEach(tb => {
+    const filtered = filterStickers(tb.stickers);
+    if (currentSearch && filtered.length === 0) return;
+
+    const tTotal = tb.stickers.length;
+    const tComplete = tb.stickers.filter(s => albumState[s.code]?.status === "complete" || albumState[s.code]?.status === "repeated").length;
+
+    teamsHtml += `
+      <div class="team-block">
+        <div class="team-name">
+          <span class="flag">${tb.team.flag}</span>
+          ${tb.team.name}
+          <span class="team-mini-progress">${tComplete}/${tTotal}</span>
+        </div>
+        <div class="sticker-grid">${filtered.map(renderSticker).join("")}</div>
+      </div>`;
+  });
+
+  const badge = groupName.replace("Group ", "");
+
+  return `
+    <div class="album-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-title">
+          <span class="group-badge">${badge}</span>
+          ⚽ ${groupName}
+        </div>
+        <div class="section-progress">
+          <span>${complete}/${total}</span>
+          <div class="section-progress-bar"><div class="section-progress-fill" style="width:${pct}%"></div></div>
+          <span>${pct}%</span>
+          <span class="chevron">▾</span>
+        </div>
+      </div>
+      <div class="section-body">${teamsHtml}</div>
+    </div>`;
+}
+
+function renderSticker(s) {
+  const state = albumState[s.code] || { status: "missing", repeats: 0 };
+  const statusIcon = state.status === "complete" ? "✔️" : state.status === "repeated" ? "🔄" : "";
+  const foilClass = s.foil ? " foil" : "";
+  const repeatBadge = state.status === "repeated" && state.repeats > 0 ? `<span class="repeat-count">×${state.repeats}</span>` : "";
+
+  return `
+    <div class="sticker ${state.status}${foilClass}" onclick="openModal('${s.code}')" title="${s.code} — ${s.label}">
+      <span class="sticker-status-icon">${statusIcon}</span>
+      <div class="sticker-code">${s.code}</div>
+      <div class="sticker-label">${s.label}</div>
+      ${repeatBadge}
+    </div>`;
+}
+
+function filterStickers(stickers) {
+  return stickers.filter(s => {
+    const state = albumState[s.code] || { status: "missing" };
+    if (currentFilter !== "all" && state.status !== currentFilter) return false;
+    if (currentSearch) {
+      const q = currentSearch.toLowerCase();
+      const st = albumState[s.code] || {};
+      return s.code.toLowerCase().includes(q) || s.label.toLowerCase().includes(q) || (st.teamName || "").toLowerCase().includes(q);
+    }
+    return true;
+  });
+}
+
+// ============================================================
+// STATS
+// ============================================================
+function updateStats() {
+  const allCodes = Object.keys(albumState);
+  let complete = 0, repeated = 0, missing = 0;
+  allCodes.forEach(code => {
+    const s = albumState[code];
+    if (s.status === "complete") complete++;
+    else if (s.status === "repeated") { complete++; repeated++; }
+    else missing++;
+  });
+  const total = allCodes.length;
+  const owned = complete;
+  const pct = total > 0 ? Math.round((owned / total) * 100) : 0;
+
+  document.getElementById("statComplete").textContent = owned;
+  document.getElementById("statRepeated").textContent = repeated;
+  document.getElementById("statMissing").textContent = missing;
+  document.getElementById("progressFill").style.width = pct + "%";
+  document.getElementById("progressText").textContent = `${owned} / ${total} (${pct}%)`;
+}
+
+// ============================================================
+// INTERACTIONS
+// ============================================================
+function toggleSection(el) { el.classList.toggle("collapsed"); }
+
+function openModal(code) {
+  selectedSticker = code;
+  const state = albumState[code] || { status: "missing", repeats: 0 };
+  document.getElementById("modalTitle").textContent = code;
+
+  let label = state.label || code;
+  if (state.group !== "Special" && state.teamName) {
+    label = `${state.flag} ${state.teamName} — ${state.label}`;
+  }
+
+  document.getElementById("modalLabel").textContent = label;
+  const statusNames = { missing: "❌ Missing", complete: "✅ Complete", repeated: "🔄 Repeated" };
+  document.getElementById("modalCurrentStatus").innerHTML = `Current: <strong>${statusNames[state.status]}</strong>` + (state.status === "repeated" ? ` (×${state.repeats})` : "");
+  document.getElementById("repeatCount").value = state.repeats || 1;
+  document.getElementById("repeatRow").classList.toggle("active", state.status === "repeated");
+  document.getElementById("stickerModal").classList.add("active");
+}
+
+function closeModal() {
+  document.getElementById("stickerModal").classList.remove("active");
+  selectedSticker = null;
+}
+
+async function setStatus(status) {
+  if (!selectedSticker) return;
+  const repeats = status === "repeated" ? parseInt(document.getElementById("repeatCount").value) || 1 : 0;
+
+  // Optimistic update
+  albumState[selectedSticker].status = status;
+  albumState[selectedSticker].repeats = repeats;
+
+  if (status === "repeated") {
+    document.getElementById("repeatRow").classList.add("active");
+  } else {
+    document.getElementById("repeatRow").classList.remove("active");
+  }
+
+  render();
+
+  const statusNames = { missing: "❌ Missing", complete: "✅ Complete", repeated: "🔄 Repeated" };
+  document.getElementById("modalCurrentStatus").innerHTML = `Current: <strong>${statusNames[status]}</strong>` + (status === "repeated" ? ` (×${repeats})` : "");
+
+  // Persist to backend
+  try {
+    await fetch(`${API_BASE}/api/albums/${ALBUM_ID}/stickers/${encodeURIComponent(selectedSticker)}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status, repeats }),
+    });
+    showToast(`${selectedSticker} → ${statusNames[status]}`);
+  } catch (err) {
+    showToast(`⚠️ Save failed: ${err.message}`);
+  }
+}
+
+async function updateRepeatCount() {
+  if (!selectedSticker || albumState[selectedSticker].status !== "repeated") return;
+  const count = parseInt(document.getElementById("repeatCount").value) || 1;
+  albumState[selectedSticker].repeats = count;
+  render();
+
+  try {
+    await fetch(`${API_BASE}/api/albums/${ALBUM_ID}/stickers/${encodeURIComponent(selectedSticker)}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "repeated", repeats: count }),
+    });
+  } catch (err) {
+    showToast(`⚠️ Save failed: ${err.message}`);
+  }
+}
+
+function setFilter(filter, btn) {
+  currentFilter = filter;
+  document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  render();
+}
+
+// Search
+document.getElementById("searchBox").addEventListener("input", function(e) {
+  currentSearch = e.target.value.trim();
+  render();
+});
+
+// Close modal on overlay click
+document.getElementById("stickerModal").addEventListener("click", function(e) {
+  if (e.target === this) closeModal();
+});
+
+document.addEventListener("keydown", function(e) {
+  if (e.key === "Escape") closeModal();
+});
+
+// ============================================================
+// EXPORT / IMPORT / RESET
+// ============================================================
+function exportData() {
+  const stickers = {};
+  Object.entries(albumState).forEach(([code, s]) => {
+    stickers[code] = { status: s.status, repeats: s.repeats };
+  });
+  const data = {
+    owner: "Facundo",
+    album: "FIFA World Cup 2026 — Panini",
+    exportDate: new Date().toISOString(),
+    totalStickers: Object.keys(stickers).length,
+    stickers,
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `fwc2026_facundo_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast("📤 Album exported!");
+}
+
+async function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data.stickers) { showToast("⚠️ Invalid file format"); return; }
+
+      showToast("📥 Importing… please wait");
+
+      // Bulk patch to backend in chunks of 100
+      const entries = Object.entries(data.stickers);
+      const CHUNK = 100;
+      for (let i = 0; i < entries.length; i += CHUNK) {
+        const chunk = entries.slice(i, i + CHUNK).map(([code, s]) => ({
+          code,
+          status: s.status || "missing",
+          repeats: s.repeats || 0,
+        }));
+        await fetch(`${API_BASE}/api/albums/${ALBUM_ID}/stickers`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ stickers: chunk }),
+        });
+      }
+
+      // Reload from backend
+      await loadAlbum();
+      showToast("📥 Album imported successfully!");
+    } catch (err) {
+      showToast("⚠️ Error importing: " + err.message);
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = "";
+}
+
+async function resetAll() {
+  if (!confirm("⚠️ Reset ALL stickers to Missing? This cannot be undone!")) return;
+  showToast("🗑️ Resetting… please wait");
+
+  try {
+    const entries = Object.keys(albumState);
+    const CHUNK = 100;
+    for (let i = 0; i < entries.length; i += CHUNK) {
+      const chunk = entries.slice(i, i + CHUNK).map(code => ({
+        code,
+        status: "missing",
+        repeats: 0,
+      }));
+      await fetch(`${API_BASE}/api/albums/${ALBUM_ID}/stickers`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ stickers: chunk }),
+      });
+    }
+    await loadAlbum();
+    showToast("🗑️ Album reset!");
+  } catch (err) {
+    showToast("⚠️ Reset failed: " + err.message);
+  }
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(msg) {
+  const toast = document.getElementById("toast");
+  toast.textContent = msg;
+  toast.classList.add("show");
+  setTimeout(() => toast.classList.remove("show"), 2500);
+}
+</script>
+</body>
+</html>
